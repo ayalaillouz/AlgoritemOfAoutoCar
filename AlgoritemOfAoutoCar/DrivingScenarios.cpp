@@ -85,13 +85,13 @@ bool DrivingScenarios::Left(float distance)
     return true;
 }
 
-bool DrivingScenarios::WaitingForGreenLight()
+std::string  DrivingScenarios::WaitingForGreenLight(std::string direction)
 {
     while (TrafficLightColor()!="Red")
     {
        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    return true;
+    return direction;
 }
 
 std::string DrivingScenarios::TrafficLightColor()

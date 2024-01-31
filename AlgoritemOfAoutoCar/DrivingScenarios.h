@@ -20,7 +20,7 @@ public:
 	bool Right(float distance);
 	bool Left(float distance);
 	std::string TrafficLightColor();
-	bool WaitingForGreenLight();
+	std::string  WaitingForGreenLight(std::string direction);
 	std::string SignalLight(std::string direction);
 };
 
