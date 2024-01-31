@@ -8,7 +8,7 @@ public:
 	static float accelerationSpeed;
 	static float currentSpeed;
 	static int secondTimer;
-	string str;
+	std::string str;
 	int temp;
 	DrivingScenarios();
    	void StartDriving();
@@ -16,10 +16,11 @@ public:
 	void SlowdownCar(int minSpeed);
 	void SpeedCar(int maxSpeed);
 	int DistanceFromCarToObject();
-	std::string ReadFromFile(string filepath);
+	std::string ReadFromFile(std::string filepath);
 	bool Right(float distance);
 	bool Left(float distance);
-	void WaitingForGreenLight(string direction);
-	std::string SignalLight(string direction);
+	std::string TrafficLightColor();
+	bool WaitingForGreenLight();
+	std::string SignalLight(std::string direction);
 };
 

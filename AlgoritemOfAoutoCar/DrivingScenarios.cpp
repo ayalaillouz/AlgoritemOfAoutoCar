@@ -21,8 +21,6 @@ void DrivingScenarios::StartDriving()
     t.detach();
     std::cout << "Timer stopped!" << std::endl;
     std::cout << "Second variable value: " << secondTimer << std::endl; // Access the second variable
- 
-
 }
 
 void DrivingScenarios::timer(int& seconds)
@@ -37,10 +35,9 @@ void DrivingScenarios::SpeedCar(int maxSpeed)
 {
     while (currentSpeed <= maxSpeed)
     {
-        currentSpeed = currentSpeed+accelerationSpeed;
+        currentSpeed = currentSpeed + accelerationSpeed;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
 }
 
 void DrivingScenarios::SlowdownCar(int MinSpeed)
@@ -88,8 +85,20 @@ bool DrivingScenarios::Left(float distance)
     return true;
 }
 
-void DrivingScenarios::WaitingForGreenLight(string)
+bool DrivingScenarios::WaitingForGreenLight()
 {
+    while (TrafficLightColor()!="Red")
+    {
+       std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    return true;
+}
+
+std::string DrivingScenarios::TrafficLightColor()
+{
+
+    str = ReadFromFile("TrafficLightColor.txt");
+    return str;
 }
 
 
