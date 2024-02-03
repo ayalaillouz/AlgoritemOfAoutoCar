@@ -40,16 +40,28 @@ void DrivingScenarios::SpeedCar(int maxSpeed)
     }
 }
 
-void DrivingScenarios::SlowdownCar(int MinSpeed)
+void DrivingScenarios::SlowdownCar(int MinSpeed=0)
 {
     while (currentSpeed >= MinSpeed)
     {
         currentSpeed = currentSpeed - accelerationSpeed;
         std::this_thread::sleep_for(std::chrono::seconds(1));   
-    }
-  
-   
+    }  
 }
+
+void DrivingScenarios::GreenLight()
+{
+    SpeedCar(MaxSpeed());
+}
+
+void DrivingScenarios::SpeedLimitSignFor80()
+{
+    std::thread slow(SlowdownCar,80);
+    std::thread speed(SpeedCar, 80);
+    slow.join();
+    speed.join();
+}
+
 int DrivingScenarios::DistanceFromCarToObject()
 {
      str=ReadFromFile("Lidar.txt");
@@ -57,13 +69,50 @@ int DrivingScenarios::DistanceFromCarToObject()
      return temp;
 }
 
-std::string DrivingScenarios::SignalLight(string direction)
+ void DrivingScenarios::RedLightStraight()
+ {
+    std::thread slowdown(SlowdownCar, 0);
+    std::thread WaitGreen(WaitingForGreenLight);
+    slowdown.join();
+    WaitGreen.join();
+    GreenLight();
+}
+ 
+ void DrivingScenarios::RedLightRight()
+ {
+     std::thread slowdown(SlowdownCar, 0);
+     std::thread Signal(SignalLight, "Right");
+     std::thread WaitGreen(WaitingForGreenLight);
+     slowdown.join();
+     Signal.join();
+     WaitGreen.join();
+     temp = DistanceFromCarToObject();
+     Right(temp);
+ }
+ void DrivingScenarios::RedLightLeft()
+ {
+     std::thread slowdown(SlowdownCar, 0);
+     std::thread WaitGreen(WaitingForGreenLight);
+     std::thread Signal(SignalLight, "Left");
+     slowdown.join();
+     WaitGreen.join();
+     Signal.join();
+     temp = DistanceFromCarToObject();
+     Left(temp);
+ }
+
+
+void DrivingScenarios::SignalLight(string direction)
 {
-    return direction;
+    signal= direction;
 }
 
+void DrivingScenarios::Stop()
+{
+    SlowdownCar();
+}
 
-bool DrivingScenarios::Right(float distance)
+void DrivingScenarios::Right(float distance)
 {
 
     while (distance >= 0)
@@ -71,10 +120,10 @@ bool DrivingScenarios::Right(float distance)
         distance = distance - accelerationSpeed;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    return true;
+
 }
 
-bool DrivingScenarios::Left(float distance)
+void DrivingScenarios::Left(float distance)
 {
 
     while (distance >= 0)
@@ -82,16 +131,15 @@ bool DrivingScenarios::Left(float distance)
         distance = distance - accelerationSpeed;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    return true;
 }
 
-std::string  DrivingScenarios::WaitingForGreenLight(std::string direction)
+void  DrivingScenarios::WaitingForGreenLight()
 {
     while (TrafficLightColor()!="Red")
     {
        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    return direction;
+
 }
 
 std::string DrivingScenarios::TrafficLightColor()
@@ -121,6 +169,11 @@ std::string DrivingScenarios::ReadFromFile(string filepath)
         std::cout << "Error: " << error << std::endl;
     }
     return fileContent;
+}
+
+int DrivingScenarios::MaxSpeed()
+{
+    return 0;
 }
 
 

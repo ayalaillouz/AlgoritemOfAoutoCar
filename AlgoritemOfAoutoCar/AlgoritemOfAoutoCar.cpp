@@ -4,29 +4,38 @@
 #include <vector>
 #include <string>
 #include <functional>
-struct func {	
-	std::string event;
-	std::list<std::string> myList;
-};
+#include <thread>         // std::thread, std::this_thread::sleep_for
+#include <chrono>
+void timerFunction()
+{
+	int seconds = 0;
+
+	while (true)
+	{
+		// Print the current second
+		std::cout << "Elapsed Time: " << seconds << " seconds" << std::endl;
+
+		// Increment the second
+		seconds++;
+
+		// Sleep for 1 second
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+}
 int main()
 {
+
+	//create Hash Table for functin in class DrivingScenarios.
+	void (DrivingScenarios:: * HashFunctionDrivingScenarios[9])();
+	HashFunctionDrivingScenarios[0] = &DrivingScenarios::RedLightStraight;
+	HashFunctionDrivingScenarios[1] = &DrivingScenarios::RedLightRight;
+	HashFunctionDrivingScenarios[2] = &DrivingScenarios::RedLightLeft;
+	HashFunctionDrivingScenarios[3] = &DrivingScenarios::GreenLight;//condition:After the traffic light turns green.
+	HashFunctionDrivingScenarios[4] = &DrivingScenarios::Stop;//condition: Stop sign,crosswalk.
+	HashFunctionDrivingScenarios[5] = &DrivingScenarios::SpeedLimitSignFor80;
 	DrivingScenarios car;
-	func PlayFunction[6];
-	PlayFunction[0].event = "Red light Straight";
-	PlayFunction[0].myList = {"SlowdownCar(0)","WaitingForGreenLight(Straight)"};
-	PlayFunction[1].event = "Red light Right";
-	PlayFunction[1].myList = { "SlowdownCar(0)","WaitingForGreenLight(Right)","SignalLight(Right)","Right()"};
-	PlayFunction[2].event = "Red light Left";
-	PlayFunction[2].myList = { "SlowdownCar(0)","WaitingForGreenLight(Left)","SignalLight(Left)","Left()" };
-	PlayFunction[3].event = "Green light";
-	PlayFunction[3].myList = { "SpeedCar(int max)"};
-	PlayFunction[4].event = "Stop sign";
-	PlayFunction[4].myList = { "SlowdownCar(0)" };
-	PlayFunction[5].event = "Speed limit sign for 80";
-	PlayFunction[5].myList = { "SlowdownCar(80)","SpeedCar(80)"};
-	PlayFunction[5].event = "crosswalk";
-	PlayFunction[5].myList = { "SlowdownCar(0)"};
-
+	std::thread timerThread(timerFunction);
 	car.StartDriving();
-
+	timerThread.join();
 }
+
