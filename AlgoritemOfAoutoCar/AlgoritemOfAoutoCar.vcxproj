@@ -129,9 +129,11 @@
   <ItemGroup>
     <ClCompile Include="AlgoritemOfAoutoCar.cpp" />
     <ClCompile Include="DrivingScenarios.cpp" />
+    <ClCompile Include="IMUSensor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrivingScenarios.h" />
+    <ClInclude Include="IMUSensor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

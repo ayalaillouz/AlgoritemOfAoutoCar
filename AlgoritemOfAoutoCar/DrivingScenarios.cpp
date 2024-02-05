@@ -58,6 +58,11 @@ int DrivingScenarios::DistanceFromCarToObject()
     WaitGreen.join();
     GreenLight();
 }
+
+ void DrivingScenarios::Settime(int second)
+ {
+     time = second;
+ }
  
  void DrivingScenarios::RedLightRight()
  {
@@ -91,6 +96,12 @@ void DrivingScenarios::SignalLight(string direction)
 void DrivingScenarios::Stop()
 {
     SlowdownCar();
+}
+
+void DrivingScenarios::calculateAcceleration()
+{
+    accelerationSpeed = (currentSpeed - 0) / time;
+   
 }
 
 void DrivingScenarios::Right(float distance)
