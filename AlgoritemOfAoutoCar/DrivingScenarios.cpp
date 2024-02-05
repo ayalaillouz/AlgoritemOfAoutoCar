@@ -12,25 +12,6 @@ DrivingScenarios::DrivingScenarios()
     secondTimer = 0;
     accelerationSpeed = 100 / 8.9; 
 }
-void DrivingScenarios::StartDriving()
-{
-   // Declare and initialize the static variable
-    std::cout << "Timer started!" << std::endl;//delete
-    std::thread t(timer, std::ref(secondTimer)); // Pass the static variable by reference
-    std::cin.get(); // Wait for user input
-    t.detach();
-    std::cout << "Timer stopped!" << std::endl;
-    std::cout << "Second variable value: " << secondTimer << std::endl; // Access the second variable
-}
-
-void DrivingScenarios::timer(int& seconds)
-{
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        seconds++;
-    }
-}
-
 void DrivingScenarios::SpeedCar(int maxSpeed)
 {
     while (currentSpeed <= maxSpeed)

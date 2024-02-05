@@ -35,7 +35,7 @@ int main()
 	HashFunctionDrivingScenarios[5] = &DrivingScenarios::SpeedLimitSignFor80;
 	DrivingScenarios car;
 	std::thread timerThread(timerFunction);
-	car.StartDriving();
+
 	timerThread.join();
 }
 
