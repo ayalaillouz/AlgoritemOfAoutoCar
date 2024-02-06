@@ -1,24 +1,35 @@
 #pragma once
 #include <thread>
+#include "DrivingScenarios.h"
+
 class IMUSensor
 {
 public:
+	IMUSensor();
 	void calculateSpeed(DrivingScenarios& carpoint);
-	void startIMUSensor();
+	void startIMUSensor(DrivingScenarios& carpoint);
 	void stopIMUSensor();
 	double getCurrentSpeed();
-	void Settime(int second);
+	double getdt();
+	double getdv();
+	double getacceleration();
+	double Gettime();
+	void Settime(double second);
 private:
 	std::thread imuThread;
-	double currentSpeed = 0.0;
-	bool isRunning = false;
-	double time = 1.0; 
-	double accelerometerX = 1.2; 
-	double accelerometerY = 3.5; 
-	double accelerometerZ = 9.8; 
-	double gyroscopeX = 0.1;  
-	double gyroscopeY = 0.3;   
-	double gyroscopeZ = 0.2;
+	double currentSpeed;
+	bool isRunning;
+	double time;
+	double accelerometerX; 
+	double accelerometerY ; 
+	double accelerometerZ; 
+	double gyroscopeX ;  
+	double gyroscopeY ;   
+	double gyroscopeZ ;
 	double acceleration;
+	double g;  // Acceleration due to gravity (approx. 9.81 m/s^2)
+	double dt;
+	double dv;
+	double Dataprocessing;
 };
 

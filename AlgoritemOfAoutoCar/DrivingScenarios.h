@@ -1,18 +1,22 @@
 #pragma once
 #include <string>
+#include "IMUSensor.h"
 class DrivingScenarios
 {
-public:
+private:
 	 double accelerationSpeed;
 	 double currentSpeed;
 	 bool degel;
 	 std::string str;
 	 std::string signal;
 	 int temp;
-	 int time;
+	 double time;
+public:
 	 DrivingScenarios();
-	 void Settime(int second);
+	 void Settime(double second);
+	 double Gettime();
 	 void SetcurrentSpeed(double speed);
+	 void SetaccelerationSpeed(double newaccelationspeed);
 	 void RedLightStraight();
 	 void RedLightRight();
 	 void RedLightLeft();
@@ -29,7 +33,7 @@ public:
 	 void  WaitingForGreenLight();
 	 void Stop();
 	 void SignalLight(std::string direction);
-	 void calculateAcceleration();
-
+	 void calculateAcceleration(IMUSensor& imuSensorpoint);
+	 void UpdateCurrentSpeed(IMUSensor& imuSensorpoint);
 };
 

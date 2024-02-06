@@ -8,8 +8,8 @@ using namespace std;
 
 DrivingScenarios::DrivingScenarios()
 {
-    currentSpeed = 0;
-    secondTimer = 0;
+    currentSpeed = 0.0;
+    time = 0;
     accelerationSpeed = 100 / 8.9; 
 }
 void DrivingScenarios::SpeedCar(int maxSpeed)
@@ -63,6 +63,16 @@ int DrivingScenarios::DistanceFromCarToObject()
  {
      time = second;
  }
+
+ int DrivingScenarios::Gettime()
+ {
+     return time;
+ }
+
+ void DrivingScenarios::SetcurrentSpeed(double speed)
+ {
+     currentSpeed = speed;
+ }
  
  void DrivingScenarios::RedLightRight()
  {
@@ -100,11 +110,13 @@ void DrivingScenarios::Stop()
 
 void DrivingScenarios::calculateAcceleration()
 {
-    accelerationSpeed = (currentSpeed - 0) / time;
+    accelerationSpeed = (currentSpeed - 0.0) / time;
    
 }
 
-void DrivingScenarios::Right(float distance)
+
+
+void DrivingScenarios::Right(double distance)
 {
 
     while (distance >= 0)
@@ -115,10 +127,10 @@ void DrivingScenarios::Right(float distance)
 
 }
 
-void DrivingScenarios::Left(float distance)
+void DrivingScenarios::Left(double distance)
 {
 
-    while (distance >= 0)
+    while (distance >= 0.0)
     {
         distance = distance - accelerationSpeed;
         std::this_thread::sleep_for(std::chrono::seconds(1));
