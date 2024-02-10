@@ -1,33 +1,95 @@
 #include "DrivingScenarios.h"
+#include "File.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <chrono>
 #include <thread>
 #include <fstream>
 #include <string>
+#include <mutex>
 using namespace std;
 
 DrivingScenarios::DrivingScenarios()
 {
     currentSpeed = 0.0;
-    time = 0;
-    accelerationSpeed = 100 / 8.9; 
+    accelerationSpeed = 0.0; 
+    temp = 0;
+    PathOfSpeed = "./src/SpeedCar.txt";
 }
-void DrivingScenarios::SpeedCar(int maxSpeed)
+void DrivingScenarios::SpeedCar(int maxSpeed = 120)
 {
-    while (currentSpeed <= maxSpeed)
+    std::lock_guard<std::mutex> lock(mtxPathOfSpeed);
+    try
     {
-        currentSpeed = currentSpeed + accelerationSpeed;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
+        std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
+        while (GetcurrentSpeed() <= maxSpeed)
+        {
+            if (std::getline(inputFile, line))
+            {
+                int num = std::stoi(line); // Convert the line to integer
+                num += accelerationSpeed; // Add 7 to the number read from the file
+                outputFile << num << std::endl; // Write the modified number to the temporary file
+            }
+            // Copy the rest of the lines from input file to the output file
+            outputFile << inputFile.rdbuf();
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        inputFile.close();
+        outputFile.close();
+    }
+    catch (const char* error) 
+    {
+        std::cerr << "Error openAndChange: " << error << std::endl;
+    }
+
+    try
+    {
+        std::rename("temp.txt", GetPathOfSpeed().c_str());
+    }
+    catch (const char* error)
+    {
+        std::cerr << "Error Rename: " << error << std::endl;
     }
 }
 
+
 void DrivingScenarios::SlowdownCar(int MinSpeed=0)
 {
-    while (currentSpeed >= MinSpeed)
+    std::lock_guard<std::mutex> lock(mtxPathOfSpeed);
+    try
     {
-        currentSpeed = currentSpeed - accelerationSpeed;
-        std::this_thread::sleep_for(std::chrono::seconds(1));   
-    }  
+        std::ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
+        std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
+        while (GetcurrentSpeed()>= MinSpeed)
+        {
+            if (std::getline(inputFile, line))
+            {
+                int num = std::stoi(line); // Convert the line to integer
+                num -= accelerationSpeed; // Add 7 to the number read from the file
+                outputFile << num << std::endl; // Write the modified number to the temporary file
+            }
+            // Copy the rest of the lines from input file to the output file
+            outputFile << inputFile.rdbuf();
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        inputFile.close();
+        outputFile.close();
+    }
+    catch (const char* error)
+    {
+        std::cerr << "Error openAndChange: " << error << std::endl;
+    }
+
+    try
+    {
+        std::rename("temp.txt", GetPathOfSpeed().c_str());
+    }
+    catch (const char* error)
+    {
+        std::cerr << "Error Rename: " << error << std::endl;
+    }
 }
 
 void DrivingScenarios::GreenLight()
@@ -59,19 +121,45 @@ int DrivingScenarios::DistanceFromCarToObject()
     GreenLight();
 }
 
- void DrivingScenarios::Settime(int second)
+ void DrivingScenarios::SettimeCar(double second)
  {
-     time = second;
+     std::lock_guard<std::mutex> lock(mtxTimeCar);
+     timeCar = second;
  }
 
- int DrivingScenarios::Gettime()
+ double DrivingScenarios::GettimeCar()
  {
-     return time;
+     std::lock_guard<std::mutex> lock(mtxTimeCar);
+     return timeCar;
+ }
+
+ string DrivingScenarios::GetPathOfSpeed()
+ {
+     return PathOfSpeed;
+ }
+
+ double DrivingScenarios::GetaccelerationSpeed()
+ {
+     std::lock_guard<std::mutex> lock(mtxAccelerationSpeed);
+     return accelerationSpeed;
+ }
+
+ double DrivingScenarios::GetcurrentSpeed()
+ {
+     std::lock_guard<std::mutex> lock(mtxCurrentSpeed);
+     return currentSpeed;
  }
 
  void DrivingScenarios::SetcurrentSpeed(double speed)
  {
+     std::lock_guard<std::mutex> lock(mtxCurrentSpeed);
      currentSpeed = speed;
+ }
+
+ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
+ {
+     std::lock_guard<std::mutex> lock(mtxAccelerationSpeed);
+     accelerationSpeed = newaccelationspeed;
  }
  
  void DrivingScenarios::RedLightRight()
@@ -108,11 +196,7 @@ void DrivingScenarios::Stop()
     SlowdownCar();
 }
 
-void DrivingScenarios::calculateAcceleration()
-{
-    accelerationSpeed = (currentSpeed - 0.0) / time;
-   
-}
+
 
 
 
@@ -149,7 +233,7 @@ void  DrivingScenarios::WaitingForGreenLight()
 std::string DrivingScenarios::TrafficLightColor()
 {
 
-    str = ReadFromFile("TrafficLightColor.txt");
+    str = ReadFromFile("../src/TrafficLightColor.txt");
     return str;
 }
 
@@ -158,12 +242,12 @@ std::string DrivingScenarios::ReadFromFile(string filepath)
 {
     std::ifstream inputFile(filepath);  // Open the file for reading
     std::string fileContent;  // Variable to store the file content
+    std::string line;
     try {
         // Read the file content into a variableReadFromFile
-        std::string line;
         while(inputFile.is_open())
         {
-            std::getline(inputFile, line);
+            std::getline(inputFile,line);
             fileContent += line + "\n";
         }
         inputFile.close();  // Close the file after reading

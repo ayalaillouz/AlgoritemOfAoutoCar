@@ -129,10 +129,12 @@
   <ItemGroup>
     <ClCompile Include="AlgoritemOfAoutoCar.cpp" />
     <ClCompile Include="DrivingScenarios.cpp" />
+    <ClCompile Include="File.cpp" />
     <ClCompile Include="IMUSensor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrivingScenarios.h" />
+    <ClInclude Include="File.h" />
     <ClInclude Include="IMUSensor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,17 +4,18 @@
 class DrivingScenarios
 {
 private:
+	std::mutex mtx;
 	 double accelerationSpeed;
 	 double currentSpeed;
 	 bool degel;
 	 std::string str;
 	 std::string signal;
 	 int temp;
-	 double time;
+	 double timeCar;
 public:
 	 DrivingScenarios();
-	 void Settime(double second);
-	 double Gettime();
+	 void SettimeCar(double second);
+	 double GettimeCar();
 	 void SetcurrentSpeed(double speed);
 	 void SetaccelerationSpeed(double newaccelationspeed);
 	 void RedLightStraight();

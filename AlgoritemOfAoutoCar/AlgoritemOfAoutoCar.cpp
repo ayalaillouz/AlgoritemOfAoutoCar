@@ -44,6 +44,7 @@ int main()
 
 	//join object
 
+
 	imuSensor.stopIMUSensor();
 	timerThread.join();
 }

@@ -2,7 +2,7 @@
 #include <thread>
 #include "DrivingScenarios.h"
 
-class IMUSensor
+ class IMUSensor
 {
 public:
 	IMUSensor();
@@ -13,19 +13,16 @@ public:
 	double getdt();
 	double getdv();
 	double getacceleration();
-	double Gettime();
-	void Settime(double second);
+	double GettimeSensor();
+	void SettimeSensor(double second);
 private:
 	std::thread imuThread;
 	double currentSpeed;
 	bool isRunning;
-	double time;
+	double timeSensor;
 	double accelerometerX; 
 	double accelerometerY ; 
 	double accelerometerZ; 
-	double gyroscopeX ;  
-	double gyroscopeY ;   
-	double gyroscopeZ ;
 	double acceleration;
 	double g;  // Acceleration due to gravity (approx. 9.81 m/s^2)
 	double dt;

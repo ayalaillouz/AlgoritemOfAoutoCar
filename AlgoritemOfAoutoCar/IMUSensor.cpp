@@ -9,7 +9,7 @@
 
 IMUSensor::IMUSensor()
 {
- time = 0;
+ time = 0.0;
  g = 9.81;  // Acceleration due to gravity (approx. 9.81 m/s^2)
  dt = 0.0;
  currentSpeed = 0.0;
@@ -76,12 +76,12 @@ double IMUSensor::getacceleration()
     return acceleration;
 }
 
-int IMUSensor::Gettime()
+double IMUSensor::Gettime()
 {
     return this->time;
 }
 
-void IMUSensor::Settime(int second)
+void IMUSensor::Settime(double second)
 {
     this->time = second;
 }
