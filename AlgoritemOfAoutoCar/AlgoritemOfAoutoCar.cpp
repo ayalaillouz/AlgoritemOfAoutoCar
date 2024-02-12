@@ -10,15 +10,14 @@
 void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 {
 	double seconds = 0;
-
 	while (true)
 	{
 		// Increment the second
 		seconds+=0.5;
 		//update time in DrivingScenarios
-		carpoint.Settime(seconds);
-		imuSensorpoint.Settime(seconds);
-		// Sleep for 1 second
+		carpoint.SettimeCar(seconds);
+		imuSensorpoint.SettimeSensor(seconds);
+		// Sleep for 0.5 second
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 }

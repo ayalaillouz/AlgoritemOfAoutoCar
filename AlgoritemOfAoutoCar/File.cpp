@@ -106,3 +106,44 @@ void File::writeToBeginningOfFile(string filePath, string textToWrite)
     fileOut << textToWrite << content;
     fileOut.close();
 }
+
+void File::processFile(const std::string& filename)
+{
+    std::ifstream inputFile(filename); // Open input file for reading
+    std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
+
+    if (!inputFile.is_open()) {
+        std::cerr << "Error opening input file." << std::endl;
+        return;
+    }
+
+    if (!outputFile.is_open()) {
+        std::cerr << "Error opening output file." << std::endl;
+        return;
+    }
+
+    std::string line;
+    int numToAdd = 7;
+
+    if (std::getline(inputFile, line)) {
+        int num = std::stoi(line); // Convert the line to integer
+        num += numToAdd; // Add 7 to the number read from the file
+        outputFile << num << std::endl; // Write the modified number to the temporary file
+    }
+
+    // Copy the rest of the lines from input file to the output file
+    outputFile << inputFile.rdbuf();
+
+    inputFile.close();
+    outputFile.close();
+
+    // Remove the original file
+    if (std::remove(filename.c_str()) != 0) {
+        std::cerr << "Error deleting original file." << std::endl;
+    }
+
+    // Rename the temporary file to the original file
+    if (std::rename("temp.txt", filename.c_str()) != 0) {
+        std::cerr << "Error renaming file." << std::endl;
+    }
+}

@@ -9,7 +9,7 @@
 
 IMUSensor::IMUSensor()
 {
- time = 0.0;
+ timeSensor = 0.0;
  g = 9.81;  // Acceleration due to gravity (approx. 9.81 m/s^2)
  dt = 0.0;
  currentSpeed = 0.0;
@@ -25,16 +25,13 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
          accelerometerX = 1.2; // m/s^2 (change these values according to your data)
          accelerometerY = 3.5; // m/s^2
          accelerometerZ = 9.8; // m/s^2
-         gyroscopeX = 0.1;    // rad/s
-         gyroscopeY = 0.3;    // rad/s
-         gyroscopeZ = 0.2;    // rad/s
          g = 9.81;  // Acceleration due to gravity (approx. 9.81 m/s^2)
         // Calculate speed based on sensor data (assuming constant acceleration)
          Dataprocessing = sqrt(accelerometerX * accelerometerX + accelerometerY * accelerometerY + accelerometerZ * accelerometerZ);
          // Calculate change in velocity using gyroscope data (assuming constant angular velocity)
         // Sleep for a certain duration (simulating real-time data acquisition)
          std::this_thread::sleep_for(std::chrono::milliseconds(500));
-         dt = time/dt;
+         dt = timeSensor /dt;
          // Estimate the current speed by integrating acceleration and change in velocity
          currentSpeed = (Dataprocessing - g) * dt;
          dv = currentSpeed / dv;
@@ -76,12 +73,12 @@ double IMUSensor::getacceleration()
     return acceleration;
 }
 
-double IMUSensor::Gettime()
+double IMUSensor::GettimeSensor()
 {
-    return this->time;
+    return this->timeSensor;
 }
 
-void IMUSensor::Settime(double second)
+void IMUSensor::SettimeSensor(double second)
 {
-    this->time = second;
+    this->timeSensor = second;
 }

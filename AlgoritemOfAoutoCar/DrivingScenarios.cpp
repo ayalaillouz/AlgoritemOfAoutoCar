@@ -24,26 +24,32 @@ void DrivingScenarios::SpeedCar(int maxSpeed = 120)
     {
         std::ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
         std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
-        while (GetcurrentSpeed() <= maxSpeed)
+        while (GetcurrentSpeed() < maxSpeed)
         {
             if (std::getline(inputFile, line))
             {
-                int num = std::stoi(line); // Convert the line to integer
-                num += accelerationSpeed; // Add 7 to the number read from the file
+                double num = std::stod(line); // Convert the line to integer
+                num += GetaccelerationSpeed(); // Add 7 to the number read from the file
                 outputFile << num << std::endl; // Write the modified number to the temporary file
             }
-            // Copy the rest of the lines from input file to the output file
-            outputFile << inputFile.rdbuf();
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+        outputFile << inputFile.rdbuf();
         inputFile.close();
         outputFile.close();
     }
-    catch (const char* error) 
+    catch (const char* error)
     {
         std::cerr << "Error openAndChange: " << error << std::endl;
     }
-
+    try
+    {
+        std::remove(GetPathOfSpeed().c_str());
+    }
+    catch (const char* error)
+    {
+        std::cerr << "Error remove: " << error << std::endl;
+    }
     try
     {
         std::rename("temp.txt", GetPathOfSpeed().c_str());
@@ -53,8 +59,6 @@ void DrivingScenarios::SpeedCar(int maxSpeed = 120)
         std::cerr << "Error Rename: " << error << std::endl;
     }
 }
-
-
 void DrivingScenarios::SlowdownCar(int MinSpeed=0)
 {
     std::lock_guard<std::mutex> lock(mtxPathOfSpeed);
@@ -62,18 +66,17 @@ void DrivingScenarios::SlowdownCar(int MinSpeed=0)
     {
         std::ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
         std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
-        while (GetcurrentSpeed()>= MinSpeed)
+        while (GetcurrentSpeed()> MinSpeed)
         {
             if (std::getline(inputFile, line))
             {
-                int num = std::stoi(line); // Convert the line to integer
-                num -= accelerationSpeed; // Add 7 to the number read from the file
+                double num = std::stod(line); // Convert the line to integer
+                num -= GetaccelerationSpeed(); // Add 7 to the number read from the file
                 outputFile << num << std::endl; // Write the modified number to the temporary file
             }
-            // Copy the rest of the lines from input file to the output file
-            outputFile << inputFile.rdbuf();
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+        outputFile << inputFile.rdbuf();
         inputFile.close();
         outputFile.close();
     }
@@ -81,7 +84,14 @@ void DrivingScenarios::SlowdownCar(int MinSpeed=0)
     {
         std::cerr << "Error openAndChange: " << error << std::endl;
     }
-
+    try
+    {
+        std::remove(GetPathOfSpeed().c_str());
+    }
+    catch (const char* error)
+    {
+        std::cerr << "Error remove: " << error << std::endl;
+    }
     try
     {
         std::rename("temp.txt", GetPathOfSpeed().c_str());

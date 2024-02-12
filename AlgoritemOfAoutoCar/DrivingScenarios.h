@@ -1,21 +1,30 @@
 #pragma once
 #include <string>
+#include <mutex>
 #include "IMUSensor.h"
 class DrivingScenarios
 {
 private:
-	std::mutex mtx;
+   	 std::mutex mtxCurrentSpeed;
+	 std::string line;
+	 std::mutex mtxAccelerationSpeed;
+	 std::mutex mtxTimeCar;
+	 std::mutex mtxPathOfSpeed;
 	 double accelerationSpeed;
 	 double currentSpeed;
 	 bool degel;
 	 std::string str;
 	 std::string signal;
+	 std::string PathOfSpeed;
 	 int temp;
 	 double timeCar;
 public:
 	 DrivingScenarios();
 	 void SettimeCar(double second);
 	 double GettimeCar();
+	 string GetPathOfSpeed();
+	 double GetaccelerationSpeed();
+	 double GetcurrentSpeed();
 	 void SetcurrentSpeed(double speed);
 	 void SetaccelerationSpeed(double newaccelationspeed);
 	 void RedLightStraight();
@@ -35,6 +44,6 @@ public:
 	 void Stop();
 	 void SignalLight(std::string direction);
 	 void calculateAcceleration(IMUSensor& imuSensorpoint);
-	 void UpdateCurrentSpeed(IMUSensor& imuSensorpoint);
+	
 };
 
