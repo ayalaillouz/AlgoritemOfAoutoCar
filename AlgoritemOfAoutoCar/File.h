@@ -10,5 +10,7 @@ public:
 	void deleteRowsFromFile(string filePath, int numRowsToDelete);
 	void writeToBeginningOfFile(string filePath, string textToWrite);
 	void processFile(const std::string& filename);
+	double calculateNearestPointDistance(std::string filename);
+
 };
 

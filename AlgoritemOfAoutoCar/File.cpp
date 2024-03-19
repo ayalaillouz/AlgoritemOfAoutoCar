@@ -147,3 +147,53 @@ void File::processFile(const std::string& filename)
         std::cerr << "Error renaming file." << std::endl;
     }
 }
+
+double File::calculateNearestPointDistance(std::string filename)
+{
+    std::ifstream file(filename);
+    double minVal = std::numeric_limits<double>::max();
+
+    if (file.is_open()) {
+        std::string line;
+        if (std::getline(file, line))
+        {
+            std::istringstream iss(line);
+            double value;
+
+            while (iss >> value)
+            {
+                if (value < minVal)
+                {
+                    minVal = value;
+                }
+            }
+
+            // Remove the line from the file
+            std::vector<std::string> remainingLines;
+            while (std::getline(file, line)) {
+                if (!line.empty()) {
+                    remainingLines.push_back(line);
+                }
+            }
+
+            file.close();
+
+            std::ofstream outFile(filename, std::ios::out | std::ios::trunc);
+            for (const auto& l : remainingLines) {
+                outFile << l << std::endl;
+            }
+            outFile.close();
+        }
+        else {
+            std::cerr << "Error: File is empty." << std::endl;
+            file.close();
+            return -1.0; // Return -1 to indicate error
+        }
+    }
+    else {
+        std::cerr << "Error: Unable to open file." << std::endl;
+        return -1.0; // Return -1 to indicate error
+    }
+
+    return minVal;
+}

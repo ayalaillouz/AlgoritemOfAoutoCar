@@ -1,22 +1,26 @@
 #pragma once
 #include <string>
 #include <mutex>
+#include <iostream>
 #include "IMUSensor.h"
+using namespace std;
 class DrivingScenarios
 {
 private:
-   	 std::mutex mtxCurrentSpeed;
-	 std::string line;
-	 std::mutex mtxAccelerationSpeed;
-	 std::mutex mtxTimeCar;
-	 std::mutex mtxPathOfSpeed;
+   	 mutex mtxCurrentSpeed;
+	 string line;
+	 mutex mtxAccelerationSpeed;
+   	 mutex mtxTimeCar;
+	 mutex mtxPathOfSpeed;
 	 double accelerationSpeed;
 	 double currentSpeed;
 	 bool degel;
-	 std::string str;
-	 std::string signal;
-	 std::string PathOfSpeed;
+	 string str;
+	 string signal;
+	 string PathOfSpeed;
+	 string direction;
 	 int temp;
+	 double distance;
 	 double timeCar;
 public:
 	 DrivingScenarios();
@@ -35,11 +39,13 @@ public:
 	 void SlowdownCar(int minSpeed=0);
 	 void SpeedCar(int maxSpeed=120);
 	 int MaxSpeed();
-	 int DistanceFromCarToObject();
-	 std::string ReadFromFile(std::string filepath);
+	 double DistanceFromCarToObject(std::string filename);
+	 string ReadFromFile(std::string filepath);
 	 void Right(double distance);
 	 void Left(double distance);
-	 std::string TrafficLightColor();
+	 string TrafficLightColor();
+	 void LaneChangeRight();
+	 void LaneChangeLeft();
 	 void  WaitingForGreenLight();
 	 void Stop();
 	 void SignalLight(std::string direction);

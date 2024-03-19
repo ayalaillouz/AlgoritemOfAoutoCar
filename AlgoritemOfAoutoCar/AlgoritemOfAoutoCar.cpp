@@ -33,6 +33,7 @@ int main()
 	HashFunctionDrivingScenarios[3] = &DrivingScenarios::GreenLight;//condition:After the traffic light turns green.
 	HashFunctionDrivingScenarios[4] = &DrivingScenarios::Stop;//condition: Stop sign,crosswalk.
 	HashFunctionDrivingScenarios[5] = &DrivingScenarios::SpeedLimitSignFor80;
+	//HashFunctionDrivingScenarios[5] = &DrivingScenarios::LaneChange;
 
 	//build object
 
