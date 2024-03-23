@@ -12,6 +12,8 @@ private:
 	 mutex mtxAccelerationSpeed;
    	 mutex mtxTimeCar;
 	 mutex mtxPathOfSpeed;
+	 mutex mtxstate;
+	 mutex mtxTrafficLightColor;
 	 double accelerationSpeed;
 	 double currentSpeed;
 	 bool degel;
@@ -22,7 +24,18 @@ private:
 	 int temp;
 	 double distance;
 	 double timeCar;
+	 string state;
+	 string TrafficLightColor;
+
 public:
+	string Getdirection();
+	string GetTrafficLightColor();
+	void SetTrafficLightColor(string newTrafficLightColor);
+	void Setdirection(string newdirection);
+	double Getdistance();
+	void Setdistance(double newdistance);
+	string Getstate();
+	void Setstate(string s);
 	 DrivingScenarios();
 	 void SettimeCar(double second);
 	 double GettimeCar();
@@ -43,13 +56,15 @@ public:
 	 string ReadFromFile(std::string filepath);
 	 void Right(double distance);
 	 void Left(double distance);
-	 string TrafficLightColor();
 	 void LaneChangeRight();
 	 void LaneChangeLeft();
 	 void  WaitingForGreenLight();
 	 void Stop();
 	 void SignalLight(std::string direction);
 	 void calculateAcceleration(IMUSensor& imuSensorpoint);
+	 string getLastCreatedFolder(const string& path);
+	 void UpdateStateFromYolo();
+	 string extractFirstWord(const string& input);
 	
 };
 

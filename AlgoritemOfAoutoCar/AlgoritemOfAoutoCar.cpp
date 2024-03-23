@@ -41,10 +41,10 @@ int main()
 	DrivingScenarios car;
 	std::thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
 	imuSensor.startIMUSensor(car);
-
+	std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
 	//join object
 
-
+	yoloThread.join();
 	imuSensor.stopIMUSensor();
 	timerThread.join();
 }

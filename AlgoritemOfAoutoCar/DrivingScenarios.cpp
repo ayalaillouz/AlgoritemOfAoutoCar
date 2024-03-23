@@ -11,7 +11,56 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <filesystem>
+#include <stdexcept>
 using namespace std;
+namespace fs = filesystem;
+
+
+string DrivingScenarios::Getdirection()
+{
+    return direction;
+}
+
+string DrivingScenarios::GetTrafficLightColor()
+{
+    lock_guard<mutex> lock(mtxTrafficLightColor);
+    return TrafficLightColor;
+}
+
+void DrivingScenarios::SetTrafficLightColor(string newTrafficLightColor)
+{
+    lock_guard<mutex>lock(mtxTrafficLightColor);
+    TrafficLightColor =newTrafficLightColor;
+}
+
+void DrivingScenarios::Setdirection(string newdirection)
+{
+    direction = newdirection;
+}
+
+double DrivingScenarios::Getdistance()
+{
+    return distance;
+}
+
+void DrivingScenarios::Setdistance(double newdistance)
+{
+    distance = newdistance;
+}
+
+string DrivingScenarios::Getstate()
+{
+    lock_guard<mutex> lock(mtxstate);
+    return state;
+    
+}
+
+void DrivingScenarios::Setstate(string s)
+{
+    lock_guard<mutex> lock(mtxstate);
+    state = s;
+}
 
 DrivingScenarios::DrivingScenarios()
 {
@@ -127,7 +176,7 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
      std::thread WaitGreen(WaitingForGreenLight);
      Signal.join();
      WaitGreen.join();
-     distance = DistanceFromCarToObject("Lidar.txt");
+     distance = DistanceFromCarToObject("src/Lidar.txt");
      Right(distance);
      direction = "Right";
  }
@@ -144,12 +193,11 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
  }
  void DrivingScenarios::SpeedCar(int maxSpeed = 120)
  {
-
      try
      {
          std::ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
          std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
-         while (GetcurrentSpeed() < maxSpeed && TrafficLightColor() != "Red")
+         while (GetcurrentSpeed() < maxSpeed && GetTrafficLightColor() != "Red")
          {
              if (std::getline(inputFile, line))
              {
@@ -192,7 +240,7 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
      {
          std::ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
          std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
-         while (GetcurrentSpeed() > MinSpeed && TrafficLightColor() == "Red")
+         while (GetcurrentSpeed() > MinSpeed && GetTrafficLightColor() == "Red")
          {
              if (std::getline(inputFile, line))
              {
@@ -239,11 +287,127 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
 
 void DrivingScenarios::SignalLight(string direction)
 {
-    while (TrafficLightColor() == "Red")
+    while (GetTrafficLightColor() == "Red")
     {
         signal = direction;
     }
 
+}
+
+string DrivingScenarios::getLastCreatedFolder(const string& path)
+{
+    fs::path folderPath(path);
+    time_t latestTime = 0;
+    string latestFolder;
+    try
+    {
+        for (const auto& entry : fs::directory_iterator(folderPath))
+        {
+            if (fs::is_directory(entry)) {
+                time_t lastWriteTime = fs::last_write_time(entry).time_since_epoch().count();
+                if (lastWriteTime > latestTime) {
+                    latestTime = lastWriteTime;
+                    latestFolder = entry.path().string();
+                }
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "An error occurred: " << e.what() << std::endl;
+    }
+    return latestFolder;
+}
+
+void DrivingScenarios::UpdateStateFromYolo()
+{
+    string folderPath = "C:/Users/USER/Documents/project/final_modal/yolov5/runs/detect";
+    string lastCreatedFolder = getLastCreatedFolder(folderPath);
+    try
+    {
+        string filePath = lastCreatedFolder + "/predictions.csv";
+
+        // Read the Excel file
+        ifstream file(filePath);
+        if (!file.is_open()) 
+        {
+            cerr << "Error opening file." << endl;
+        }
+
+        // Temporarily store lines that do not contain column B content
+        vector<string> fileData;
+        string line;
+        while (getline(file, line))
+        {
+            size_t pos = 0;
+            int columnCount = 1;
+            bool deleteRow = false;
+            string res;
+      
+            // Parse the line to check for column B content
+            while ((pos = line.find(',')) != std::string::npos)
+            {
+                res=line.substr(0, pos);
+                line.erase(0, pos + 1);
+                if (columnCount == 2)
+                {
+                    Setstate(res);
+                    //cout << "Column B Content: " <<res << endl;
+                    deleteRow = true;
+                }
+
+                columnCount++;
+            }
+
+            if (deleteRow)
+            {
+                // Skip adding the line to fileData vector
+                deleteRow = false;
+            }
+            else
+            {
+                fileData.push_back(line);
+            }
+        }
+
+        file.close();
+
+        // Write the updated data back to the file
+        ofstream outFile(filePath);
+        try
+        {
+            if (outFile.is_open())
+            {
+                for (const auto& data : fileData)
+                {
+                    outFile << data << std::endl;
+                }
+                outFile.close();
+            }
+        }
+        catch (const exception& e)
+        {
+            cerr << "An error occurred: " << e.what() << std::endl;
+        }
+    }
+    catch (const exception& e)
+    {
+        cerr << "An error occurred: " << e.what() << std::endl;
+    }
+}
+
+string DrivingScenarios::extractFirstWord(const string& input)
+{
+    size_t pos = input.find(' '); // Find the first space character
+
+    if (pos !=string::npos)
+    {
+        return input.substr(0, pos); // Extract the substring up to the first space
+    }
+    else 
+    {
+        return " "; // Return the whole string if no space is found
+    }
 }
 
 void DrivingScenarios::Stop()
@@ -267,36 +431,33 @@ void DrivingScenarios::Left(double distance)
 
     while (distance >= 0.0)
     {
-        distance = distance - accelerationSpeed;
+        Setdistance(Getdistance() -GetaccelerationSpeed());
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 
 void  DrivingScenarios::WaitingForGreenLight()
 {
-    while (TrafficLightColor()!="Red")
+    while (GetTrafficLightColor() =="Red")
     {
        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
 }
 
-string DrivingScenarios::TrafficLightColor()
-{
-
-    str = ReadFromFile("../src/TrafficLightColor.txt");
-    return str;
-}
 
 void DrivingScenarios::LaneChangeRight()
 {
+    Setdirection("Right");
     SignalLight("Right");
 
 }
 
 void DrivingScenarios::LaneChangeLeft()
 {
+    Setdirection("Left");
     SignalLight("Left");
+
 }
 
 
