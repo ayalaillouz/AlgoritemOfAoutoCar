@@ -21,19 +21,26 @@ void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 }
-
+#define CHECK_DIRECTION(direction) (direction == "right" ?1:0 )
+#define CHECK_STRAIGHT(direction) (direction!= "right" && direction!= "left" ?2:0 ) 
 int main()
 {
 	//create Hash Table for functin in class DrivingScenarios.
 
-	void (DrivingScenarios:: * HashFunctionDrivingScenarios[9])();
+	void (DrivingScenarios:: * HashFunctionDrivingScenarios[6])();
 	HashFunctionDrivingScenarios[0] = &DrivingScenarios::RedLightStraight;
 	HashFunctionDrivingScenarios[1] = &DrivingScenarios::RedLightRight;
 	HashFunctionDrivingScenarios[2] = &DrivingScenarios::RedLightLeft;
 	HashFunctionDrivingScenarios[3] = &DrivingScenarios::GreenLight;//condition:After the traffic light turns green.
 	HashFunctionDrivingScenarios[4] = &DrivingScenarios::Stop;//condition: Stop sign,crosswalk.
 	HashFunctionDrivingScenarios[5] = &DrivingScenarios::SpeedLimitSignFor80;
+
 	//HashFunctionDrivingScenarios[5] = &DrivingScenarios::LaneChange;
+
+	void (DrivingScenarios:: * HashFunctionDirection[3])(double);
+	HashFunctionDirection[0] = &DrivingScenarios::Left;
+	HashFunctionDirection[1] = &DrivingScenarios::Right;
+	HashFunctionDirection[2] = &DrivingScenarios::Straight;
 
 	//build object
 
@@ -42,6 +49,15 @@ int main()
 	std::thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
 	imuSensor.startIMUSensor(car);
 	std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
+
+	while (1)
+	{
+
+	}
+
+
+
+
 	//join object
 
 	yoloThread.join();

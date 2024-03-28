@@ -14,6 +14,10 @@ private:
 	 mutex mtxPathOfSpeed;
 	 mutex mtxstate;
 	 mutex mtxTrafficLightColor;
+	 mutex mtxvelosityX;
+	 mutex mtxvelosityY;
+	 mutex mtxoldvelosityX;
+	 mutex mtxoldvelosityY;
 	 double accelerationSpeed;
 	 double currentSpeed;
 	 bool degel;
@@ -26,8 +30,23 @@ private:
 	 double timeCar;
 	 string state;
 	 string TrafficLightColor;
+	 char buffer[128];
+	 FILE* pipe;
+	 vector<double> filtered_positions;
+	 double velosityX ;
+	 double velosityY;
+	 double oldvelosityX ;
+	 double oldvelosityY;
 
 public:
+	double GetvelosityX();
+	double GetvelosityY();
+	double GetoldvelosityX();
+	double GetoldvelosityY();
+	void SetoldvelosityX(double newoldvelosityX);
+	void SetoldvelosityY(double newoldvelosityY);
+	void SetvelosityX(double newvelosityX);
+	void SetvelosityY(double newvelosityY);
 	string Getdirection();
 	string GetTrafficLightColor();
 	void SetTrafficLightColor(string newTrafficLightColor);
@@ -56,6 +75,7 @@ public:
 	 string ReadFromFile(std::string filepath);
 	 void Right(double distance);
 	 void Left(double distance);
+	 void Straight(double distance=0);
 	 void LaneChangeRight();
 	 void LaneChangeLeft();
 	 void  WaitingForGreenLight();
@@ -65,6 +85,7 @@ public:
 	 string getLastCreatedFolder(const string& path);
 	 void UpdateStateFromYolo();
 	 string extractFirstWord(const string& input);
-	
+	 void ConnectKalmanFilter();
+	 
 };
 

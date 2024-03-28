@@ -13,6 +13,9 @@
 #include <limits>
 #include <filesystem>
 #include <stdexcept>
+#include <iostream>
+#include <cstdlib>
+#include <vector>
 using namespace std;
 namespace fs = filesystem;
 
@@ -34,6 +37,26 @@ void DrivingScenarios::SetTrafficLightColor(string newTrafficLightColor)
     TrafficLightColor =newTrafficLightColor;
 }
 
+double DrivingScenarios::GetvelosityX()
+{
+    lock_guard<mutex>lock(mtxvelosityX);
+    return velosityX;
+}
+double DrivingScenarios::GetvelosityY()
+{
+    lock_guard<mutex>lock(mtxvelosityY);
+    return velosityY;
+}
+double DrivingScenarios::GetoldvelosityX()
+{
+    lock_guard<mutex>lock(mtxoldvelosityX);
+    return oldvelosityX;
+}
+double DrivingScenarios::GetoldvelosityY()
+{
+    lock_guard<mutex>lock(mtxoldvelosityY);
+    return oldvelosityY;
+}
 void DrivingScenarios::Setdirection(string newdirection)
 {
     direction = newdirection;
@@ -44,6 +67,28 @@ double DrivingScenarios::Getdistance()
     return distance;
 }
 
+void DrivingScenarios::SetvelosityX(double newvelosityX)
+{
+    lock_guard<mutex>lock(mtxvelosityX);
+    velosityX = newvelosityX;
+    ConnectKalmanFilter();
+}
+void DrivingScenarios::SetvelosityY(double newvelosityY)
+{
+    lock_guard<mutex>lock(mtxvelosityY);
+    velosityY = newvelosityY;
+    ConnectKalmanFilter();
+}
+void DrivingScenarios::SetoldvelosityX(double newoldvelosityX)
+{
+    lock_guard<mutex>lock(mtxvelosityX);
+     oldvelosityX= newoldvelosityX;
+}
+void DrivingScenarios::SetoldvelosityY(double newoldvelosityY)
+{
+    lock_guard<mutex>lock(mtxvelosityY);
+    oldvelosityY = newoldvelosityY;
+}
 void DrivingScenarios::Setdistance(double newdistance)
 {
     distance = newdistance;
@@ -68,6 +113,10 @@ DrivingScenarios::DrivingScenarios()
     accelerationSpeed = 0.0; 
     temp = 0;
     PathOfSpeed = "./src/SpeedCar.txt";
+    velosityX=0;
+    velosityY=0;
+    oldvelosityX=0;
+    oldvelosityY=0;
 }
 
 
@@ -410,6 +459,44 @@ string DrivingScenarios::extractFirstWord(const string& input)
     }
 }
 
+void DrivingScenarios::ConnectKalmanFilter()
+{
+    string result = "";
+    try
+    {
+        // Calling the Kalman filter from a Python file with the parameters we recorded
+        string command = "python.exe kalmanFilter.py " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " + to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
+        pipe = _popen(command.c_str(), "r");
+        while (!feof(pipe))
+        {
+            if (fgets(buffer, 128, pipe) != NULL)
+                result += buffer;
+        }
+
+
+        stringstream ss(result);
+        double pos;
+        while (ss >> pos)
+        {
+            filtered_positions.push_back(pos);
+        }
+
+
+        // Access and manipulate the filtered positions as needed
+        cout << "Filtered positions as double array:" << endl;
+        for (double position : filtered_positions)
+        {
+            cout << position << " ";
+        }
+        SetoldvelosityX(filtered_positions[2]);
+        SetoldvelosityY(filtered_positions[3]);
+        _pclose(pipe);
+    }
+    catch (const exception& e) {
+        cerr << "Exception caught: " << e.what() << endl;
+    }
+}
+
 void DrivingScenarios::Stop()
 {
     SlowdownCar();
@@ -436,6 +523,12 @@ void DrivingScenarios::Left(double distance)
     }
 }
 
+void DrivingScenarios::Straight(double distance=0)
+{
+    Setdistance(Getdistance() - GetaccelerationSpeed());
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+}
+
 void  DrivingScenarios::WaitingForGreenLight()
 {
     while (GetTrafficLightColor() =="Red")
@@ -459,8 +552,6 @@ void DrivingScenarios::LaneChangeLeft()
     SignalLight("Left");
 
 }
-
-
 
 string DrivingScenarios::ReadFromFile(string filepath)
 {
