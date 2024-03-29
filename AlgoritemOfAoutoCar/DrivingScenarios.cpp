@@ -71,13 +71,11 @@ void DrivingScenarios::SetvelosityX(double newvelosityX)
 {
     lock_guard<mutex>lock(mtxvelosityX);
     velosityX = newvelosityX;
-    ConnectKalmanFilter();
 }
 void DrivingScenarios::SetvelosityY(double newvelosityY)
 {
     lock_guard<mutex>lock(mtxvelosityY);
     velosityY = newvelosityY;
-    ConnectKalmanFilter();
 }
 void DrivingScenarios::SetoldvelosityX(double newoldvelosityX)
 {
@@ -459,13 +457,13 @@ string DrivingScenarios::extractFirstWord(const string& input)
     }
 }
 
-void DrivingScenarios::ConnectKalmanFilter()
+void DrivingScenarios::ConnectKalmanFilter(IMUSensor& imuSensorpoint)
 {
     string result = "";
     try
     {
         // Calling the Kalman filter from a Python file with the parameters we recorded
-        string command = "python.exe kalmanFilter.py " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " + to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
+        string command = "python.exe kalmanFilter.py " + to_string(imuSensorpoint.getdt()) + " " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " + to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
         pipe = _popen(command.c_str(), "r");
         while (!feof(pipe))
         {

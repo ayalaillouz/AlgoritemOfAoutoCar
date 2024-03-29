@@ -1,5 +1,6 @@
 ﻿#include "DrivingScenarios.h"
 #include "IMUSensor.h"
+#include "Gpssenssor.h"
 #include <iostream>
 #include <list>
 #include <vector>
@@ -46,22 +47,21 @@ int main()
 
 	IMUSensor imuSensor;
 	DrivingScenarios car;
+	Gpssenssor gpsSenssor;
 	std::thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
 	imuSensor.startIMUSensor(car);
 	std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
-
+	std::thread Gpsthread(&Gpssenssor::UpdatePossion,"src/Gps.txt",&car,&imuSensor);
 	while (1)
 	{
 
 	}
 
-
-
-
 	//join object
 
 	yoloThread.join();
 	imuSensor.stopIMUSensor();
+	Gpsthread.join();
 	timerThread.join();
 }
 

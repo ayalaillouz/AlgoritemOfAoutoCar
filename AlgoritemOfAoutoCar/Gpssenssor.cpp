@@ -1,10 +1,15 @@
 #include "Gpssenssor.h"
+#include "IMUSensor.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
 
-void Gpssenssor::UpdatePossion(const std::string& filename, DrivingScenarios& carpoint)
+Gpssenssor::Gpssenssor()
+{
+
+}
+void Gpssenssor::UpdatePossion(const std::string& filename, DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 {
     std::ifstream file(filename);
    // std::vector<std::pair<double, double>> values;
@@ -18,7 +23,8 @@ void Gpssenssor::UpdatePossion(const std::string& filename, DrivingScenarios& ca
             iss >>pos1>>pos2;
             carpoint.SetvelosityX(pos1);
             carpoint.SetvelosityX(pos2);
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            carpoint.ConnectKalmanFilter(imuSensorpoint);
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
         file.close();
     }
