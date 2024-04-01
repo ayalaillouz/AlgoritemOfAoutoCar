@@ -11,6 +11,7 @@ private:
 	 string line;
 	 mutex mtxAccelerationSpeed;
    	 mutex mtxTimeCar;
+	 mutex mtxdistance;
 	 mutex mtxPathOfSpeed;
 	 mutex mtxstate;
 	 mutex mtxTrafficLightColor;
@@ -37,7 +38,7 @@ private:
 	 double velosityY;
 	 double oldvelosityX ;
 	 double oldvelosityY;
-
+	 double distance;
 public:
 	double GetvelosityX();
 	double GetvelosityY();
@@ -51,6 +52,8 @@ public:
 	string GetTrafficLightColor();
 	void SetTrafficLightColor(string newTrafficLightColor);
 	void Setdirection(string newdirection);
+	double Getdistance();
+	void Setdistance(double newdistance);
 	double Getdistance();
 	void Setdistance(double newdistance);
 	string Getstate();
@@ -85,7 +88,7 @@ public:
 	 string getLastCreatedFolder(const string& path);
 	 void UpdateStateFromYolo();
 	 string extractFirstWord(const string& input);
-	 void ConnectKalmanFilter();
+	 void ConnectKalmanFilter(IMUSensor& imuSensorpoint);
 	 
 };
 

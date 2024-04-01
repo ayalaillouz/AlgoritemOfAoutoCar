@@ -51,7 +51,7 @@ int main()
 	std::thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
 	imuSensor.startIMUSensor(car);
 	std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
-	std::thread Gpsthread(&Gpssenssor::UpdatePossion,"src/Gps.txt",&car,&imuSensor);
+	std::thread Gpsthread(&Gpssenssor::UpdatePossion,"src/GPS.txt",&car,&imuSensor);
 	while (1)
 	{
 

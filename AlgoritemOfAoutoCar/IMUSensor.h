@@ -11,8 +11,6 @@ public:
 	void stopIMUSensor();
 	double getCurrentSpeed();
 	double getdt();
-	double getdv();
-	double getacceleration();
 	double GettimeSensor();
 	void SettimeSensor(double second);
 private:
@@ -20,13 +18,7 @@ private:
 	double currentSpeed;
 	bool isRunning;
 	double timeSensor;
-	double accelerometerX; 
-	double accelerometerY ; 
-	double accelerometerZ; 
-	double acceleration;
-	double g;  // Acceleration due to gravity (approx. 9.81 m/s^2)
-	double dt;
-	double dv;
+	double speedX, speedY, time, speed, distanceInOneSecond, distance,dt;
 	double Dataprocessing;
 };
 

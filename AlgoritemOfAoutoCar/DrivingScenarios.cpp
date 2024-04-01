@@ -211,10 +211,23 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
  }
  void DrivingScenarios::RedLightStraight()
  {
+     SetTrafficLightColor("Red");
      SlowdownCar();
-     WaitingForGreenLight();
-     GreenLight();
+     //WaitingForGreenLight();
+     //GreenLight();
      direction = "Straight";
+     std::this_thread::sleep_for(std::chrono::seconds(1)); 
+ }
+ double DrivingScenarios::Getdistance()
+ {
+     lock_guard<mutex>lock(mtxdistance);
+     return distance;
+
+ }
+ void DrivingScenarios::Setdistance(double newdistance)
+ {
+     lock_guard<mutex>lock(mtxdistance);
+     distance = newdistance;
  }
  void DrivingScenarios::RedLightRight()
  {
