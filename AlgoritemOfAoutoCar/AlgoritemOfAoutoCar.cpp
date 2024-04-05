@@ -10,16 +10,17 @@
 #include <chrono>
 void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 {
-	double seconds = 0;
+	int seconds = 0;
 	while (true)
 	{
 		// Increment the second
-		seconds+=0.5;
+		seconds++;
 		//update time in DrivingScenarios
 		carpoint.SettimeCar(seconds);
 		imuSensorpoint.SettimeSensor(seconds);
 		// Sleep for 0.5 second
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
 #define CHECK_DIRECTION(direction) (direction == "right" ?1:0 )
@@ -55,8 +56,8 @@ int main()
 	while (1)
 	{
 
-	}
-
+	}  
+	   
 	//join object
 
 	yoloThread.join();

@@ -16,6 +16,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <array>
+#include <stdbool.h>
 using namespace std;
 namespace fs = filesystem;
 
@@ -115,6 +117,8 @@ DrivingScenarios::DrivingScenarios()
     velosityY=0;
     oldvelosityX=0;
     oldvelosityY=0;
+    arrState.fill(false);
+    onyolo=false;
 }
 
 
@@ -181,13 +185,13 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
     accelerationSpeed = newaccelationspeed;
 }
 
- void DrivingScenarios::SettimeCar(double second)
+ void DrivingScenarios::SettimeCar(int second)
  {
      std::lock_guard<std::mutex> lock(mtxTimeCar);
      timeCar = second;
  }
 
- double DrivingScenarios::GettimeCar()
+ int DrivingScenarios::GettimeCar()
  {
      std::lock_guard<std::mutex> lock(mtxTimeCar);
      return timeCar;
@@ -382,77 +386,21 @@ string DrivingScenarios::getLastCreatedFolder(const string& path)
 void DrivingScenarios::UpdateStateFromYolo()
 {
     string folderPath = "C:/Users/USER/Documents/project/final_modal/yolov5/runs/detect";
-    string lastCreatedFolder = getLastCreatedFolder(folderPath);
-    try
+    string lastCreatedFolder = getLastCreatedFolder(folderPath)+"/labels";
+    onyolo = true;
+    while (onyolo)
     {
-        string filePath = lastCreatedFolder + "/predictions.csv";
-
-        // Read the Excel file
-        ifstream file(filePath);
-        if (!file.is_open()) 
+        for (const auto& entry : std::filesystem::directory_iterator(folderPath))
         {
-            cerr << "Error opening file." << endl;
+            if (entry.path().extension() == ".txt")
+            {
+                processFile(entry.path().string());
+            }
+            //std::this_thread::sleep_for(std::chrono::seconds(2));
         }
 
-        // Temporarily store lines that do not contain column B content
-        vector<string> fileData;
-        string line;
-        while (getline(file, line))
-        {
-            size_t pos = 0;
-            int columnCount = 1;
-            bool deleteRow = false;
-            string res;
-      
-            // Parse the line to check for column B content
-            while ((pos = line.find(',')) != std::string::npos)
-            {
-                res=line.substr(0, pos);
-                line.erase(0, pos + 1);
-                if (columnCount == 2)
-                {
-                    Setstate(res);
-                    //cout << "Column B Content: " <<res << endl;
-                    deleteRow = true;
-                }
-
-                columnCount++;
-            }
-
-            if (deleteRow)
-            {
-                // Skip adding the line to fileData vector
-                deleteRow = false;
-            }
-            else
-            {
-                fileData.push_back(line);
-            }
-        }
-
-        file.close();
-
-        // Write the updated data back to the file
-        ofstream outFile(filePath);
-        try
-        {
-            if (outFile.is_open())
-            {
-                for (const auto& data : fileData)
-                {
-                    outFile << data << std::endl;
-                }
-                outFile.close();
-            }
-        }
-        catch (const exception& e)
-        {
-            cerr << "An error occurred: " << e.what() << std::endl;
-        }
-    }
-    catch (const exception& e)
-    {
-        cerr << "An error occurred: " << e.what() << std::endl;
+        // Wait for 1 second before checking again
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 
@@ -506,6 +454,33 @@ void DrivingScenarios::ConnectKalmanFilter(IMUSensor& imuSensorpoint)
     catch (const exception& e) {
         cerr << "Exception caught: " << e.what() << endl;
     }
+}
+
+void DrivingScenarios::processFile(const string& filePath)
+{
+    ifstream inputFile(filePath);
+    int state;
+    if (!inputFile)
+    {
+        std::cerr << "Error opening the file: " << filePath << "\n";
+        return;
+    }
+
+    string word;
+    while (inputFile >> word)
+    {
+       state= stoi(word);
+       arrState[state] = true;
+       
+        // Ignore the rest of the line
+        inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    inputFile.close(); // Close the file after processing
+
+    // Close the file and then delete it
+    std::remove(filePath.c_str());
+    std::cout << "File " << filePath << " processed and deleted.\n";
 }
 
 void DrivingScenarios::Stop()

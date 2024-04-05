@@ -11,13 +11,13 @@ public:
 	void stopIMUSensor();
 	double getCurrentSpeed();
 	double getdt();
-	double GettimeSensor();
-	void SettimeSensor(double second);
+	int GettimeSensor();
+	void SettimeSensor(int second);
 private:
 	std::thread imuThread;
 	double currentSpeed;
 	bool isRunning;
-	double timeSensor;
+	int timeSensor;
 	double speedX, speedY, time, speed, distanceInOneSecond, distance,dt;
 	double Dataprocessing;
 };

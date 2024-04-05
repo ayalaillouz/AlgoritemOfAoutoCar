@@ -2,6 +2,7 @@
 #include <string>
 #include <mutex>
 #include <iostream>
+#include <stdbool.h>
 #include "IMUSensor.h"
 using namespace std;
 class DrivingScenarios
@@ -28,7 +29,8 @@ private:
 	 string direction;
 	 int temp;
 	 double distance;
-	 double timeCar;
+	 int timeCar;
+	 bool onyolo;
 	 string state;
 	 string TrafficLightColor;
 	 char buffer[128];
@@ -39,6 +41,7 @@ private:
 	 double oldvelosityX ;
 	 double oldvelosityY;
 	 double distance;
+	 array<bool,8> arrState;
 public:
 	double GetvelosityX();
 	double GetvelosityY();
@@ -59,8 +62,8 @@ public:
 	string Getstate();
 	void Setstate(string s);
 	 DrivingScenarios();
-	 void SettimeCar(double second);
-	 double GettimeCar();
+	 void SettimeCar(int second);
+	 int GettimeCar();
 	 string GetPathOfSpeed();
 	 double GetaccelerationSpeed();
 	 double GetcurrentSpeed();
@@ -89,6 +92,6 @@ public:
 	 void UpdateStateFromYolo();
 	 string extractFirstWord(const string& input);
 	 void ConnectKalmanFilter(IMUSensor& imuSensorpoint);
-	 
+	 void processFile(const std::string& filePath);
 };
 
