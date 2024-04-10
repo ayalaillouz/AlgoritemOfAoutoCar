@@ -18,9 +18,24 @@
 #include <vector>
 #include <array>
 #include <stdbool.h>
+
+#define check_RedLightStraight(state)((state ==0||state==3)?0:1);
+#define check_RedLightRight(state)(state ==5?0:1);
+#define check_RedLightLeft(state)(state ==4?0:1);
+#define check_GreenLight(state)((state ==1||state==6||state==7||state==8)?0:1);
+#define check_Stop(state)((state ==9||state==11)?0:1);
+#define check_SpeedLimitSignFor80(state)(state ==10?0:1);
 using namespace std;
 namespace fs = filesystem;
+void DrivingScenarios::PlayHashFunctionDirection(int placeinhash, double distance)
+{
 
+    (this->*HashFunctionDirection[placeinhash])(distance);
+}
+void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
+{
+    (this->*HashFunctionDrivingScenarios[placeinhash])();
+}
 
 string DrivingScenarios::Getdirection()
 {
@@ -117,9 +132,22 @@ DrivingScenarios::DrivingScenarios()
     velosityY=0;
     oldvelosityX=0;
     oldvelosityY=0;
-    arrState.fill(false);
+   // arrState.fill(false);
     onyolo=false;
+    ////fill HashFunctionDrivingScenarios
+    //HashFunctionDrivingScenarios[0] = &DrivingScenarios::RedLightStraight;
+    //HashFunctionDrivingScenarios[1] = &DrivingScenarios::RedLightRight;
+    //HashFunctionDrivingScenarios[2] = &DrivingScenarios::RedLightLeft;
+    //HashFunctionDrivingScenarios[3] = &DrivingScenarios::GreenLight;//condition:After the traffic light turns green.
+    //HashFunctionDrivingScenarios[4] = &DrivingScenarios::Stop;//condition: Stop sign,crosswalk.
+    //HashFunctionDrivingScenarios[5] = &DrivingScenarios::SpeedLimitSignFor80;
+    ////fill HashFunctionDirection
+    //HashFunctionDirection[0] = &DrivingScenarios::Left;
+    //HashFunctionDirection[1] = &DrivingScenarios::Right;
+    //HashFunctionDirection[2] = &DrivingScenarios::Straight;
 }
+
+
 
 
 double DrivingScenarios::DistanceFromCarToObject(std::string filename)
@@ -459,7 +487,7 @@ void DrivingScenarios::ConnectKalmanFilter(IMUSensor& imuSensorpoint)
 void DrivingScenarios::processFile(const string& filePath)
 {
     ifstream inputFile(filePath);
-    int state;
+    int state, placeinHashFunctionDrivingScenarios;
     if (!inputFile)
     {
         std::cerr << "Error opening the file: " << filePath << "\n";
@@ -470,6 +498,7 @@ void DrivingScenarios::processFile(const string& filePath)
     while (inputFile >> word)
     {
        state= stoi(word);
+       placeinHashFunctionDrivingScenarios = check_RedLightStraight(state) + check_RedLightRight(state) + check_RedLightLeft(state) + check_GreenLight(state) + check_Stop(state) + check_SpeedLimitSignFor80(state);
        arrState[state] = true;
        
         // Ignore the rest of the line
@@ -496,21 +525,23 @@ void DrivingScenarios::Right(double distance)
         distance = distance - accelerationSpeed;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
+    Setdirection("Right");
 }
 
 void DrivingScenarios::Left(double distance)
 {
-
+    
     while (distance >= 0.0)
     {
         Setdistance(Getdistance() -GetaccelerationSpeed());
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+    Setdirection("Left");
 }
 
 void DrivingScenarios::Straight(double distance=0)
 {
+    Setdirection("Straight");
     Setdistance(Getdistance() - GetaccelerationSpeed());
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }

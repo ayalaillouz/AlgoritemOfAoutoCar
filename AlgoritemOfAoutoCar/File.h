@@ -1,16 +1,13 @@
 #pragma once
 #include <iostream>
+#include <string.h>
 using namespace std;
 class File
 {
 public:
-	string ReadFromFileAllText(string path);
-	string ReadFromFileWord(string path);
-	void deleteFirstLine(string filePath);
-	void deleteRowsFromFile(string filePath, int numRowsToDelete);
-	void writeToBeginningOfFile(string filePath, string textToWrite);
-	void processFile(const std::string& filename);
-	double calculateNearestPointDistance(std::string filename);
+	File();
+	string GetWordAfterLastDash(const std::string& sentence);
+	double ExtractLastWordToDouble(const string& sentence);
 
 };
 

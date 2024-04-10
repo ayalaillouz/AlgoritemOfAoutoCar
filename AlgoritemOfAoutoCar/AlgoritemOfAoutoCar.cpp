@@ -1,13 +1,21 @@
 ﻿#include "DrivingScenarios.h"
 #include "IMUSensor.h"
 #include "Gpssenssor.h"
+#include "File.h"
 #include <iostream>
 #include <list>
 #include <vector>
-#include <string>
+#include <string.h>
 #include <functional>
 #include <thread>         // std::thread, std::this_thread::sleep_for
 #include <chrono>
+#include <string>
+#include <fstream>
+#include <sstream>
+
+
+using namespace std;
+
 void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 {
 	int seconds = 0;
@@ -23,41 +31,46 @@ void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
-#define CHECK_DIRECTION(direction) (direction == "right" ?1:0 )
-#define CHECK_STRAIGHT(direction) (direction!= "right" && direction!= "left" ?2:0 ) 
+#define CHECK_STRAIGHT(direction) ((direction!= "right" && direction!= "left")?2:0 )
+#define CHECK_DIRECTION(direction) (direction == "right" ?1:0)
 int main()
 {
-	//create Hash Table for functin in class DrivingScenarios.
-
-	void (DrivingScenarios:: * HashFunctionDrivingScenarios[6])();
-	HashFunctionDrivingScenarios[0] = &DrivingScenarios::RedLightStraight;
-	HashFunctionDrivingScenarios[1] = &DrivingScenarios::RedLightRight;
-	HashFunctionDrivingScenarios[2] = &DrivingScenarios::RedLightLeft;
-	HashFunctionDrivingScenarios[3] = &DrivingScenarios::GreenLight;//condition:After the traffic light turns green.
-	HashFunctionDrivingScenarios[4] = &DrivingScenarios::Stop;//condition: Stop sign,crosswalk.
-	HashFunctionDrivingScenarios[5] = &DrivingScenarios::SpeedLimitSignFor80;
-
-	//HashFunctionDrivingScenarios[5] = &DrivingScenarios::LaneChange;
-
-	void (DrivingScenarios:: * HashFunctionDirection[3])(double);
-	HashFunctionDirection[0] = &DrivingScenarios::Left;
-	HashFunctionDirection[1] = &DrivingScenarios::Right;
-	HashFunctionDirection[2] = &DrivingScenarios::Straight;
 
 	//build object
 
 	IMUSensor imuSensor;
 	DrivingScenarios car;
 	Gpssenssor gpsSenssor;
-	std::thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
+	File files;
+	thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
 	imuSensor.startIMUSensor(car);
-	std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
-	std::thread Gpsthread(&Gpssenssor::UpdatePossion,"src/GPS.txt",&car,&imuSensor);
-	while (1)
-	{
+	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
+	thread Gpsthread(&Gpssenssor::UpdatePossion,"src/GPS.txt",&car,&imuSensor);
+	//start
+	//read Filestring direction;
 
-	}  
-	   
+	string direction;
+	int placeinarr;
+	double distance;
+	string filename = "src/Instructions.txt";
+	ifstream file(filename);
+	if (!file.is_open())
+	{
+		cout << "לא ניתן לפתוח את הקובץ." << endl;
+		return 1;
+	}
+	string line;
+	while (getline(file, line))
+	{
+		direction = files.GetWordAfterLastDash(line);
+		distance = files.ExtractLastWordToDouble(line);
+		placeinarr = CHECK_DIRECTION(direction) + CHECK_STRAIGHT(direction);
+		car.PlayHashFunctionDirection(placeinarr,distance);
+		cout << "distance: " << distance << endl;
+		this_thread::sleep_for(chrono::seconds(1));
+	}
+	file.close();
+
 	//join object
 
 	yoloThread.join();
