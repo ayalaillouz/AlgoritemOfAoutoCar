@@ -1,5 +1,6 @@
+#pragma once
+#include "DrivingScenarios.h"
 #include "Gpssenssor.h"
-#include "IMUSensor.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,9 +10,9 @@ Gpssenssor::Gpssenssor()
 {
 
 }
-void Gpssenssor::UpdatePossion(const std::string& filename, DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
+void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
 {
-    std::ifstream file(filename);
+    std::ifstream file("src/GPS.txt");
    // std::vector<std::pair<double, double>> values;
     double pos1, pos2;
     try
@@ -22,9 +23,9 @@ void Gpssenssor::UpdatePossion(const std::string& filename, DrivingScenarios& ca
             std::istringstream iss(line);
             iss >>pos1>>pos2;
             carpoint.SetvelosityX(pos1);
-            carpoint.SetvelosityX(pos2);
-            carpoint.ConnectKalmanFilter(imuSensorpoint);
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            carpoint.SetvelosityY(pos2);
+            carpoint.ConnectKalmanFilter();
+            this_thread::sleep_for(chrono::seconds(2));
         }
         file.close();
     }

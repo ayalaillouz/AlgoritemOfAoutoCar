@@ -1,8 +1,9 @@
 #pragma once
-#include <thread>
 #include "DrivingScenarios.h"
+#include <thread>
+using namespace std;
 
- class IMUSensor
+class IMUSensor
 {
 public:
 	IMUSensor();
@@ -10,15 +11,17 @@ public:
 	void startIMUSensor(DrivingScenarios& carpoint);
 	void stopIMUSensor();
 	double getCurrentSpeed();
-	double getdt();
+	//double getdt();
 	int GettimeSensor();
 	void SettimeSensor(int second);
 private:
-	std::thread imuThread;
+	thread imuThread;
+	mutex mtxtimeSensor;
 	double currentSpeed;
 	bool isRunning;
 	int timeSensor;
-	double speedX, speedY, time, speed, distanceInOneSecond, distance,dt;
+	double speedX, speedY, time, speed, distanceInOneSecond, distance;
+	//double dt;
 	double Dataprocessing;
 };
 

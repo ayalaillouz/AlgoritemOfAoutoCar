@@ -1,19 +1,18 @@
-﻿#include "DrivingScenarios.h"
+﻿
+#include "File.h"
+#include "DrivingScenarios.h"
 #include "IMUSensor.h"
 #include "Gpssenssor.h"
-#include "File.h"
 #include <iostream>
 #include <list>
 #include <vector>
 #include <string.h>
 #include <functional>
-#include <thread>         // std::thread, std::this_thread::sleep_for
+#include <thread> // std::thread, std::this_thread::sleep_for
 #include <chrono>
 #include <string>
 #include <fstream>
 #include <sstream>
-
-
 using namespace std;
 
 void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
@@ -45,10 +44,9 @@ int main()
 	thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
 	imuSensor.startIMUSensor(car);
 	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
-	thread Gpsthread(&Gpssenssor::UpdatePossion,"src/GPS.txt",&car,&imuSensor);
+	thread Gpsthread(&Gpssenssor::UpdatePossion,&car,&imuSensor);
 	//start
 	//read Filestring direction;
-
 	string direction;
 	int placeinarr;
 	double distance;
@@ -72,7 +70,7 @@ int main()
 	file.close();
 
 	//join object
-
+	car.Offyolo();
 	yoloThread.join();
 	imuSensor.stopIMUSensor();
 	Gpsthread.join();

@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
 #include <mutex>
+#include <vector>
+#include <array>
 #include <iostream>
 #include <stdbool.h>
-#include "IMUSensor.h"
+#include "File.h"
+
 using namespace std;
 class DrivingScenarios
 {
@@ -13,6 +16,7 @@ private:
 	 mutex mtxAccelerationSpeed;
    	 mutex mtxTimeCar;
 	 mutex mtxdistance;
+
 	 mutex mtxPathOfSpeed;
 	 mutex mtxstate;
 	 mutex mtxTrafficLightColor;
@@ -40,8 +44,9 @@ private:
 	 double velosityY;
 	 double oldvelosityX ;
 	 double oldvelosityY;
-	 double distance;
-	 //array<bool,8> arrState;
+	 double dt;
+	 double distancetoturn;
+	 array<bool,8> arrState;
 
 
 public:
@@ -58,6 +63,8 @@ public:
 	 string GetTrafficLightColor();
 	 double Getdistance();
 	 string Getstate();
+	 double Getdistancetoturn();
+
 	 double GetaccelerationSpeed();
 	 double GetcurrentSpeed();
 	 int GettimeCar();
@@ -68,7 +75,6 @@ public:
 	 void SetvelosityY(double newvelosityY);
 	 void SetTrafficLightColor(string newTrafficLightColor);
 	 void Setdirection(string newdirection);
-	 void Setdistance(double newdistance);
 	 void Setdistance(double newdistance);
 	 void Setstate(string s);
 	 void SettimeCar(int second);
@@ -84,19 +90,21 @@ public:
 	 int MaxSpeed();
 	 double DistanceFromCarToObject(std::string filename);
 	 string ReadFromFile(std::string filepath);
-	 void Right(double distance);
-	 void Left(double distance);
-	 void Straight(double distance=0);
+	 void Right(double distancetoturnRight);
+	 void Left(double distancetoturnLeft);
+	 void Setdistancetoturn(double newdistancetoturn);
+	 void Straight(double distancetoturnStraight=0);
 	 void LaneChangeRight();
 	 void LaneChangeLeft();
 	 void  WaitingForGreenLight();
 	 void Stop();
 	 void SignalLight(std::string direction);
-	 void calculateAcceleration(IMUSensor& imuSensorpoint);
+	// void calculateAcceleration(IMUSensor& imuSensorpoint);
 	 string getLastCreatedFolder(const string& path);
 	 void UpdateStateFromYolo();
 	 string extractFirstWord(const string& input);
-	 void ConnectKalmanFilter(IMUSensor& imuSensorpoint);
+	 void ConnectKalmanFilter();
 	 void processFile(const std::string& filePath);
+	 void Offyolo();
 };
 

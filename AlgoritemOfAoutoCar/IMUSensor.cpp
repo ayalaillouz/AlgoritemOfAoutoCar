@@ -1,23 +1,26 @@
-#include "IMUSensor.h"
-#include "DrivingScenarios.h"
+#pragma once
 #include <thread>
 #include <corecrt_math.h>
 #include <locale>
 #include <xlocale>
+#include <mutex>
 #include <fstream>
 #include <sstream>
 #include <chrono>
 #include <thread>
 #include <cmath>
 #include <string>
-
+#include "IMUSensor.h"
+#include "DrivingScenarios.h"
+using namespace std;
 IMUSensor::IMUSensor()
 {
- timeSensor = 0.0;
+ timeSensor = 0;
  distance = 0.0;
  currentSpeed = 0.0;
  isRunning = false;
- dt = 1.0;
+ //dt = 1.0;
+
 }
 
 
@@ -25,7 +28,7 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
 {   
     double prevSpeed = 0.0,acceleration; // Initialize previous speed variable
 
-    ifstream inputFile("data.txt"); // Open the text file for reading
+    ifstream inputFile("src/IMUsensor.txt"); // Open the text file for reading
     if (!inputFile.is_open())
     {
         cerr << "Error opening file." << endl;
@@ -38,18 +41,16 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
     
         istringstream iss(line);
         iss >> speedX >> speedY; // Extract speed X, speed Y, and time from the line
-        speed = sqrt(speedX * speedX + speedY * speedY); // Calculate the total speed
+        speed = sqrt((speedX * speedX) +( speedY * speedY)); // Calculate the total speed
 
         acceleration = (speed - prevSpeed); // Calculate acceleration
         carpoint.SetaccelerationSpeed(acceleration);
-
         carpoint.SetcurrentSpeed(speed);
         distance += (speed * 1000 / 3600 * GettimeSensor()); // Calculate the total distance covered directly
         carpoint.Setdistance(distance);
         cout << "Distance covered in current iteration: " << distance << " meters" << endl;
-
         prevSpeed = speed; // Update previous speed to current speed
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait for 1 second between iterations
+        this_thread::sleep_for(chrono::seconds(1)); // Wait for 1 second between iterations
     }
 
     inputFile.close(); // Close the file
@@ -59,35 +60,38 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
 
 void IMUSensor::startIMUSensor(DrivingScenarios& carpoint)
 {
-    this->isRunning = true;
-    imuThread = std::thread(&IMUSensor::calculateSpeed, carpoint);
+    isRunning = true;
+    imuThread = thread(&IMUSensor::calculateSpeed, carpoint);
 }
 
 void IMUSensor::stopIMUSensor()
 {
-    this->isRunning = false;
+    isRunning = false;
     imuThread.join();
 }
 
 double IMUSensor::getCurrentSpeed()
 {
-    return this->currentSpeed;
+    return currentSpeed;
 }
 
-double IMUSensor::getdt()
-{
-    return this->dt;
-}
+//double IMUSensor::getdt()
+//{
+//    return dt;
+//}
 
 
 
 
 int IMUSensor::GettimeSensor()
 {
-    return this->timeSensor;
+
+    lock_guard<mutex> lock(mtxtimeSensor);
+    return timeSensor;
 }
 
 void IMUSensor::SettimeSensor(int second)
 {
-    this->timeSensor = second;
+    lock_guard<mutex> lock(mtxtimeSensor);
+    timeSensor = second;
 }

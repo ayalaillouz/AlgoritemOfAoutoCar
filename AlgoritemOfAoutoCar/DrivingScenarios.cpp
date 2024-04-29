@@ -1,5 +1,6 @@
-#include "DrivingScenarios.h"
+#pragma once
 #include "File.h"
+#include "DrivingScenarios.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -27,6 +28,10 @@
 #define check_SpeedLimitSignFor80(state)(state ==10?0:1);
 using namespace std;
 namespace fs = filesystem;
+/// <summary>
+/// 
+/// </summary>
+
 void DrivingScenarios::PlayHashFunctionDirection(int placeinhash, double distance)
 {
 
@@ -36,6 +41,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
 {
     (this->*HashFunctionDrivingScenarios[placeinhash])();
 }
+
 
 string DrivingScenarios::Getdirection()
 {
@@ -54,58 +60,68 @@ void DrivingScenarios::SetTrafficLightColor(string newTrafficLightColor)
     TrafficLightColor =newTrafficLightColor;
 }
 
-double DrivingScenarios::GetvelosityX()
-{
-    lock_guard<mutex>lock(mtxvelosityX);
-    return velosityX;
-}
-double DrivingScenarios::GetvelosityY()
-{
-    lock_guard<mutex>lock(mtxvelosityY);
-    return velosityY;
-}
+/// <summary>
+/// 
+/// </summary>
+/// <returns></returns>
 double DrivingScenarios::GetoldvelosityX()
 {
     lock_guard<mutex>lock(mtxoldvelosityX);
     return oldvelosityX;
 }
+/// <summary>
+/// 
+/// </summary>
+/// <returns></returns>
 double DrivingScenarios::GetoldvelosityY()
 {
     lock_guard<mutex>lock(mtxoldvelosityY);
     return oldvelosityY;
 }
-void DrivingScenarios::Setdirection(string newdirection)
-{
-    direction = newdirection;
-}
-
-double DrivingScenarios::Getdistance()
-{
-    return distance;
-}
-
-void DrivingScenarios::SetvelosityX(double newvelosityX)
-{
-    lock_guard<mutex>lock(mtxvelosityX);
-    velosityX = newvelosityX;
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="newvelosityY"></param>
 void DrivingScenarios::SetvelosityY(double newvelosityY)
 {
     lock_guard<mutex>lock(mtxvelosityY);
     velosityY = newvelosityY;
 }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="newoldvelosityX"></param>
 void DrivingScenarios::SetoldvelosityX(double newoldvelosityX)
 {
     lock_guard<mutex>lock(mtxvelosityX);
-     oldvelosityX= newoldvelosityX;
+    oldvelosityX = newoldvelosityX;
 }
-void DrivingScenarios::SetoldvelosityY(double newoldvelosityY)
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="newdirection"></param>
+void DrivingScenarios::Setdirection(string newdirection)
 {
-    lock_guard<mutex>lock(mtxvelosityY);
-    oldvelosityY = newoldvelosityY;
+    direction = newdirection;
 }
+
+/// <summary>
+/// 
+
+double DrivingScenarios::Getdistance()
+{
+    lock_guard<mutex>lock(mtxdistance);
+    return distance;
+
+}
+/// <summary>
+/// 
+/// </summary>
+
 void DrivingScenarios::Setdistance(double newdistance)
 {
+    lock_guard<mutex>lock(mtxdistance);
     distance = newdistance;
 }
 
@@ -115,6 +131,16 @@ string DrivingScenarios::Getstate()
     return state;
     
 }
+/// <summary>
+/// 
+/// </summary>
+/// <returns></returns>
+double DrivingScenarios::Getdistancetoturn()
+{
+    return distancetoturn;
+}
+
+
 
 void DrivingScenarios::Setstate(string s)
 {
@@ -132,6 +158,7 @@ DrivingScenarios::DrivingScenarios()
     velosityY=0;
     oldvelosityX=0;
     oldvelosityY=0;
+    dt = 1.0;
    // arrState.fill(false);
     onyolo=false;
     ////fill HashFunctionDrivingScenarios
@@ -200,13 +227,18 @@ double DrivingScenarios::DistanceFromCarToObject(std::string filename)
     }
     return minVal;
 }
+/// <summary>
+/// 
+/// </summary>
 
 void DrivingScenarios::SetcurrentSpeed(double speed)
 {
     std::lock_guard<std::mutex> lock(mtxCurrentSpeed);
     currentSpeed = speed;
 }
-
+/// <summary>
+/// 
+/// </summary>
 void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
 {
     std::lock_guard<std::mutex> lock(mtxAccelerationSpeed);
@@ -250,46 +282,56 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
      direction = "Straight";
      std::this_thread::sleep_for(std::chrono::seconds(1)); 
  }
- double DrivingScenarios::Getdistance()
- {
-     lock_guard<mutex>lock(mtxdistance);
-     return distance;
 
- }
- void DrivingScenarios::Setdistance(double newdistance)
- {
-     lock_guard<mutex>lock(mtxdistance);
-     distance = newdistance;
- }
+ //void DrivingScenarios::RedLightRight()
+ //{
+ //    SlowdownCar();
+ //    
+ //    std::thread Signal(SignalLight, "Right");
+
+ //    std::thread WaitGreen(WaitingForGreenLight);
+ //    Signal.join();
+ //    WaitGreen.join();
+ //    distance = DistanceFromCarToObject("src/Lidar.txt");
+ //    Right(distance);
+ //    direction = "Right";
+ //}
  void DrivingScenarios::RedLightRight()
  {
      SlowdownCar();
-     std::thread Signal(SignalLight, "Right");
-     std::thread WaitGreen(WaitingForGreenLight);
+
+     // Use '&' to create a pointer to the member function WaitingForGreenLight
+     std::thread WaitGreen(&DrivingScenarios::WaitingForGreenLight, this);
+
+     // Assuming SignalLight is also a member function, use '&' to create a pointer to it
+     std::thread Signal(&DrivingScenarios::SignalLight, this, "Right");
+
      Signal.join();
      WaitGreen.join();
+
      distance = DistanceFromCarToObject("src/Lidar.txt");
      Right(distance);
      direction = "Right";
  }
+
  void DrivingScenarios::RedLightLeft()
  {
      SlowdownCar();
-     std::thread WaitGreen(WaitingForGreenLight);
-     std::thread Signal(SignalLight, "Left");
+     std::thread WaitGreen( &DrivingScenarios::WaitingForGreenLight, this);
+     std::thread Signal(&DrivingScenarios::SignalLight,this, "Left");
      WaitGreen.join();
      Signal.join();
      distance = DistanceFromCarToObject("src/Lidar.txt");
      Left(distance);
      direction = "Left";
  }
- void DrivingScenarios::SpeedCar(int maxSpeed = 120)
+ void DrivingScenarios::SpeedCar(int maxSpeed)
  {
      try
      {
          std::ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
          std::ofstream outputFile("temp.txt", std::ios::trunc); // Create temporary output file
-         while (GetcurrentSpeed() < maxSpeed && GetTrafficLightColor() != "Red")
+         while (GetcurrentSpeed() <maxSpeed && GetTrafficLightColor() != "Red")
          {
              if (std::getline(inputFile, line))
              {
@@ -318,14 +360,20 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
      }
      try
      {
-         std::rename("temp.txt", GetPathOfSpeed().c_str());
+
+         int result = std::rename("temp.txt", GetPathOfSpeed().c_str());
+         if (result != 0)
+         {
+             std::cerr << "Error Rename: Unable to rename file." << std::endl;
+         }
+
      }
      catch (const char* error)
      {
          std::cerr << "Error Rename: " << error << std::endl;
      }
  }
- void DrivingScenarios::SlowdownCar(int MinSpeed = 0)
+ void DrivingScenarios::SlowdownCar(int MinSpeed)
  {
 
      try
@@ -361,7 +409,13 @@ void DrivingScenarios::SetaccelerationSpeed(double newaccelationspeed)
      }
      try
      {
-         std::rename("temp.txt", GetPathOfSpeed().c_str());
+
+         int result = std::rename("temp.txt", GetPathOfSpeed().c_str());
+         if (result != 0)
+         {
+             std::cerr << "Error Rename: Unable to rename file." << std::endl;
+         }
+        
      }
      catch (const char* error)
      {
@@ -385,6 +439,9 @@ void DrivingScenarios::SignalLight(string direction)
     }
 
 }
+/// <summary>
+/// 
+/// </summary>
 
 string DrivingScenarios::getLastCreatedFolder(const string& path)
 {
@@ -411,6 +468,8 @@ string DrivingScenarios::getLastCreatedFolder(const string& path)
     return latestFolder;
 }
 
+/// <summary>
+/// </summary>
 void DrivingScenarios::UpdateStateFromYolo()
 {
     string folderPath = "C:/Users/USER/Documents/project/final_modal/yolov5/runs/detect";
@@ -418,7 +477,7 @@ void DrivingScenarios::UpdateStateFromYolo()
     onyolo = true;
     while (onyolo)
     {
-        for (const auto& entry : std::filesystem::directory_iterator(folderPath))
+        for (const auto& entry : filesystem::directory_iterator(folderPath))
         {
             if (entry.path().extension() == ".txt")
             {
@@ -428,7 +487,7 @@ void DrivingScenarios::UpdateStateFromYolo()
         }
 
         // Wait for 1 second before checking again
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        this_thread::sleep_for(chrono::seconds(1));
     }
 }
 
@@ -445,14 +504,17 @@ string DrivingScenarios::extractFirstWord(const string& input)
         return " "; // Return the whole string if no space is found
     }
 }
-
-void DrivingScenarios::ConnectKalmanFilter(IMUSensor& imuSensorpoint)
+/// <summary>
+/// 
+/// </summary>
+/// <param name="imuSensorpoint"></param>
+void DrivingScenarios::ConnectKalmanFilter()
 {
     string result = "";
     try
     {
         // Calling the Kalman filter from a Python file with the parameters we recorded
-        string command = "python.exe kalmanFilter.py " + to_string(imuSensorpoint.getdt()) + " " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " + to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
+        string command = "python.exe kalmanFilter.py " + to_string(dt) + " " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " + to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
         pipe = _popen(command.c_str(), "r");
         while (!feof(pipe))
         {
@@ -479,10 +541,14 @@ void DrivingScenarios::ConnectKalmanFilter(IMUSensor& imuSensorpoint)
         SetoldvelosityY(filtered_positions[3]);
         _pclose(pipe);
     }
-    catch (const exception& e) {
+    catch (const exception& e) 
+    {
         cerr << "Exception caught: " << e.what() << endl;
     }
 }
+/// <summary>
+/// 
+/// </summary>
 
 void DrivingScenarios::processFile(const string& filePath)
 {
@@ -512,38 +578,71 @@ void DrivingScenarios::processFile(const string& filePath)
     std::cout << "File " << filePath << " processed and deleted.\n";
 }
 
+/// <summary>
+/// </summary>
+void DrivingScenarios::Offyolo()
+{
+    onyolo = false;
+}
+
 void DrivingScenarios::Stop()
 {
     SlowdownCar();
 }
 
-void DrivingScenarios::Right(double distance)
-{
+/// <summary>
+/// 
+/// </summary>
 
-    while (distance >= 0.0)
+void DrivingScenarios::Right(double distancetoturnRight)
+{
+    Setdistancetoturn(distancetoturnRight);
+    while (Getdistancetoturn() >= Getdistance())
     {
-        distance = distance - accelerationSpeed;
+        Setdistancetoturn(Getdistancetoturn() - GetaccelerationSpeed());
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+    Setdistance(0.0);
     Setdirection("Right");
 }
 
-void DrivingScenarios::Left(double distance)
+/// <summary>
+/// 
+/// </summary>
+/// <param name="distance"></param>
+void DrivingScenarios::Left(double distancetoturnLeft)
 {
-    
-    while (distance >= 0.0)
+    Setdistancetoturn(distancetoturnLeft);
+    while (Getdistancetoturn()>=Getdistance())
     {
-        Setdistance(Getdistance() -GetaccelerationSpeed());
+        Setdistancetoturn(Getdistancetoturn()-GetaccelerationSpeed());
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+    Setdistance(0.0);
     Setdirection("Left");
 }
-
-void DrivingScenarios::Straight(double distance=0)
+/// <summary>
+/// 
+/// </summary>
+/// <param name="newdistancetoturn"></param>
+void DrivingScenarios::Setdistancetoturn(double newdistancetoturn)
+{
+    distancetoturn = newdistancetoturn;
+}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="distancetoturnStraight"></param>
+void DrivingScenarios::Straight(double distancetoturnStraight)
 {
     Setdirection("Straight");
-    Setdistance(Getdistance() - GetaccelerationSpeed());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    Setdistancetoturn(distancetoturnStraight);
+    while (Getdistancetoturn() >= Getdistance())
+    {
+        Setdistancetoturn(Getdistancetoturn() - GetaccelerationSpeed());
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    Setdistance(0.0);
 }
 
 void  DrivingScenarios::WaitingForGreenLight()
