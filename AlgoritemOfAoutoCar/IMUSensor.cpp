@@ -27,33 +27,32 @@ IMUSensor::IMUSensor()
 void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
 {   
     double prevSpeed = 0.0,acceleration; // Initialize previous speed variable
-
-    ifstream inputFile("src/IMUsensor.txt"); // Open the text file for reading
-    if (!inputFile.is_open())
-    {
-        cerr << "Error opening file." << endl;
-    }
-
     string line;
     while (isRunning)
     {
-        getline(inputFile, line);
-    
-        istringstream iss(line);
-        iss >> speedX >> speedY; // Extract speed X, speed Y, and time from the line
-        speed = sqrt((speedX * speedX) +( speedY * speedY)); // Calculate the total speed
-
-        acceleration = (speed - prevSpeed); // Calculate acceleration
-        carpoint.SetaccelerationSpeed(acceleration);
-        carpoint.SetcurrentSpeed(speed);
-        distance += (speed * 1000 / 3600 * GettimeSensor()); // Calculate the total distance covered directly
-        carpoint.Setdistance(distance);
-        cout << "Distance covered in current iteration: " << distance << " meters" << endl;
-        prevSpeed = speed; // Update previous speed to current speed
-        this_thread::sleep_for(chrono::seconds(1)); // Wait for 1 second between iterations
+       ifstream inputFile("src/IMUsensor.txt"); // Open the text file for reading
+       if (!inputFile.is_open())
+       {
+           cerr << "Error opening file." << endl;
+       }
+       getline(inputFile, line);
+       
+       istringstream iss(line);
+       iss >> speedX >> speedY; // Extract speed X, speed Y, and time from the line
+       speed = sqrt((speedX * speedX) +( speedY * speedY)); // Calculate the total speed
+       
+       acceleration = (speed - prevSpeed); // Calculate acceleration
+       carpoint.SetaccelerationSpeed(acceleration);
+       carpoint.SetcurrentSpeed(speed);
+       distance += (speed * 1000 / 3600 * GettimeSensor()); // Calculate the total distance covered directly
+       carpoint.Setdistance(distance);
+       cout << "Distance covered in current iteration: " << distance << " meters" << endl;
+       prevSpeed = speed; // Update previous speed to current speed
+       inputFile.close(); // Close the file
+       this_thread::sleep_for(chrono::seconds(1)); // Wait for 1 second between iterations
     }
 
-    inputFile.close(); // Close the file
+    
     //    cout << "Total distance covered: " << distance << " meters" << endl;
 }
 

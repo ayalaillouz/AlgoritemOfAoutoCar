@@ -41,10 +41,10 @@ int main()
 	DrivingScenarios car;
 	Gpssenssor gpsSenssor;
 	File files;
-	thread timerThread(timerFunction, std::ref(car), std::ref(imuSensor));
-	imuSensor.startIMUSensor(car);
-	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, &car);
-	thread Gpsthread(&Gpssenssor::UpdatePossion,&car,&imuSensor);
+	thread timerThread(timerFunction, ref(car), ref(imuSensor));
+	imuSensor.startIMUSensor(ref(car));
+	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, ref(car));
+	thread Gpsthread(&Gpssenssor::UpdatePossion, ref(car),ref(imuSensor));
 	//start
 	//read Filestring direction;
 	string direction;
@@ -60,6 +60,7 @@ int main()
 	string line;
 	while (getline(file, line))
 	{
+		car.Setmaxspeed(100);
 		direction = files.GetWordAfterLastDash(line);
 		distance = files.ExtractLastWordToDouble(line);
 		placeinarr = CHECK_DIRECTION(direction) + CHECK_STRAIGHT(direction);
