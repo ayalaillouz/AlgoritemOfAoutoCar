@@ -53,8 +53,12 @@ private:
 	 int maxspeed;
 
 public:
-	 void (DrivingScenarios::*HashFunctionDrivingScenarios[6])() = {&DrivingScenarios::RedLightStraight,&DrivingScenarios::RedLightRight,&DrivingScenarios::RedLightLeft,&DrivingScenarios::GreenLight,&DrivingScenarios::Stop,&DrivingScenarios::SpeedLimitSignFor80};
-	 void (DrivingScenarios::*HashFunctionDirection[3])(double) = { &DrivingScenarios::Left,&DrivingScenarios::Right,&DrivingScenarios::Straight };
+	 void (DrivingScenarios::*HashFunctionDrivingScenarios[6])() = {&DrivingScenarios::RedLightStraight,&DrivingScenarios::RedLightRight,
+																    &DrivingScenarios::RedLightLeft,&DrivingScenarios::GreenLight,
+																	&DrivingScenarios::Stop,&DrivingScenarios::SpeedLimitSignFor80};
+	 void (DrivingScenarios::*HashFunctionDirection[3])(double) = { &DrivingScenarios::Left,&DrivingScenarios::Right,
+																	&DrivingScenarios::Straight };
+
 	 void PlayHashFunctionDirection( int placeinhash, double dist);
 	 void PlayHashFunctionDrivingScenarios(int placeinhash);
 	 DrivingScenarios();

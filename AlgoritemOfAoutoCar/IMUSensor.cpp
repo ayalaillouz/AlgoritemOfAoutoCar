@@ -50,9 +50,7 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
        prevSpeed = speed; // Update previous speed to current speed
        inputFile.close(); // Close the file
        this_thread::sleep_for(chrono::seconds(1)); // Wait for 1 second between iterations
-    }
-
-    
+    } 
     //    cout << "Total distance covered: " << distance << " meters" << endl;
 }
 

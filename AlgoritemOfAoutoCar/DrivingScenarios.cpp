@@ -288,6 +288,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
 
  void DrivingScenarios::RedLightStraight()
  {
+
      Setplay(false);
      SetTrafficLightColor("Red");
      while (GetTrafficLightColor() == "Red")
@@ -298,7 +299,9 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
          std::this_thread::sleep_for(std::chrono::seconds(1));
      }
      Setplay(true);
+     arrState[0] = false;
      Straight(Getdistancetoturn());
+  
  }
 
  void DrivingScenarios::RedLightRight()
@@ -321,6 +324,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
       
      }
      Setplay(true);
+     arrState[1] = false;
      Right(distancetoturn);
  }
 
@@ -345,6 +349,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
          }
      }
      Setplay(true);
+     arrState[2] = false;
      Left(Getdistancetoturn());
      
  }
@@ -475,6 +480,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
          SpeedCar(MaxSpeed());
          this_thread::sleep_for(chrono::seconds(1));
      }
+     arrState[3] = false;
  }
  void DrivingScenarios::Stop()
  {
@@ -483,7 +489,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
          SlowdownCar();
          this_thread::sleep_for(chrono::seconds(1));
      }
-
+     arrState[4] = false;
  }
 
  int DrivingScenarios::MaxSpeed()
@@ -504,7 +510,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
          SlowdownCar(80);
          this_thread::sleep_for(chrono::seconds(1));
      }
-
+     arrState[5] = false;
  }
 
  void DrivingScenarios::SignalLight(string direction)
@@ -643,9 +649,6 @@ void DrivingScenarios::UpdateStateFromYolo()
             }
             //std::this_thread::sleep_for(std::chrono::seconds(2));
         }
-
-        // Wait for 1 second before checking again
-        this_thread::sleep_for(chrono::seconds(1));
     }
 }
 
@@ -669,7 +672,8 @@ void DrivingScenarios::ConnectKalmanFilter()
     try
     {
         // Calling the Kalman filter from a Python file with the parameters we recorded
-        string command = "python.exe kalmanFilter.py " + to_string(dt) + " " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " + to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
+        string command = "python.exe kalmanFilter.py " + to_string(dt) + " " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " +
+            to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
         pipe = _popen(command.c_str(), "r");
         while (!feof(pipe))
         {
@@ -717,14 +721,15 @@ void DrivingScenarios::processFile(const string& filePath)
     while (inputFile >> word)
     {
        state= stoi(word);
-       placeinHashFunctionDrivingScenarios = check_RedLightStraight(state) + check_RedLightRight(state) + check_RedLightLeft(state) + check_GreenLight(state) + check_Stop(state) + check_SpeedLimitSignFor80(state);
-       if (state >= 0 && state < 8)
+       placeinHashFunctionDrivingScenarios = check_RedLightStraight(state) + check_RedLightRight(state) 
+           + check_RedLightLeft(state) + check_GreenLight(state) + check_Stop(state) + check_SpeedLimitSignFor80(state);
+       if (arrState[state] != true)
        {
            arrState[state] = true;
+           thread t(&DrivingScenarios::PlayHashFunctionDrivingScenarios, this, state);
+           t.detach();
+     
        }
-         
-      
-       
         // Ignore the rest of the line
         inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
@@ -735,6 +740,8 @@ void DrivingScenarios::processFile(const string& filePath)
     std::remove(filePath.c_str());
     std::cout << "File " << filePath << " processed and deleted.\n";
 }
+
+
 
 
 void DrivingScenarios::Offyolo()

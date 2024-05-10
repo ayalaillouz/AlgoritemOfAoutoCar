@@ -30,6 +30,8 @@ void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
+
+
 #define CHECK_STRAIGHT(direction) ((direction!= "right" && direction!= "left")?2:0 )
 #define CHECK_DIRECTION(direction) (direction == "right" ?1:0)
 int main()

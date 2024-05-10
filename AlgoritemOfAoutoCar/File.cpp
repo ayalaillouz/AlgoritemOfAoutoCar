@@ -4,9 +4,14 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
+#include "File.h"
 using namespace std;
 
-string GetWordAfterLastDash(const std::string& sentence)
+File::File()
+{
+}
+
+string File::GetWordAfterLastDash(const std::string& sentence)
 {
     size_t lastDashPos = sentence.rfind('-');
 
@@ -27,7 +32,8 @@ string GetWordAfterLastDash(const std::string& sentence)
     return ""; // Return an empty string if no word is found after the last dash
 }
 
-double ExtractLastWordToDouble(const string& sentence) {
+double File::ExtractLastWordToDouble(const string& sentence)
+{
     istringstream iss(sentence);
     string word;
     string lastWord;
@@ -40,3 +46,4 @@ double ExtractLastWordToDouble(const string& sentence) {
 
     return convertedValue;
 }
+

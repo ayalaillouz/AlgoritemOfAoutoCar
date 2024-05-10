@@ -11,17 +11,13 @@ public:
 	void startIMUSensor(DrivingScenarios& carpoint);
 	void stopIMUSensor();
 	double getCurrentSpeed();
-	//double getdt();
 	int GettimeSensor();
 	void SettimeSensor(int second);
 private:
 	thread imuThread;
 	mutex mtxtimeSensor;
-	double currentSpeed;
 	bool isRunning;
 	int timeSensor;
-	double speedX, speedY, time, speed, distanceInOneSecond, distance;
-	//double dt;
-	double Dataprocessing;
+	double speedX, speedY, time, speed, distanceInOneSecond, distance, Dataprocessing, currentSpeed;
 };
 
