@@ -8,18 +8,19 @@
 
 Gpssenssor::Gpssenssor()
 {
+    onGps = true;
 
 }
 void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
 {
     std::ifstream file("src/GPS.txt");
-   // std::vector<std::pair<double, double>> values;
     double pos1, pos2;
     try
     {
         std::string line;
-        while (std::getline(file, line)) 
+        while (onGps)
         {
+            std::getline(file, line);
             std::istringstream iss(line);
             iss >>pos1>>pos2;
             carpoint.SetvelosityX(pos1);
@@ -34,4 +35,10 @@ void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
         std::cout << "Error: " << error << std::endl;
     }
 
+}
+
+void Gpssenssor::OffGPS()
+{
+    lock_guard<mutex>lock(mtxGps);
+    onGps = false;
 }

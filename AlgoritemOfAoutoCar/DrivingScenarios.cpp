@@ -36,7 +36,7 @@ DrivingScenarios::DrivingScenarios()
     currentSpeed = 0.0;
     accelerationSpeed = 0.0;
     temp = 0;
-    PathOfSpeed = "./src/SpeedCar.txt";
+    PathOfSpeed = "src/IMUsensor.txt";
     velosityX = 0;
     velosityY = 0;
     oldvelosityX = 0;
@@ -416,7 +416,6 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
  {
      if (GetcurrentSpeed() > MinSpeed)
      {
-
          try
          {
              string line;
@@ -636,7 +635,7 @@ string DrivingScenarios::getLastCreatedFolder(const string& path)
 
 void DrivingScenarios::UpdateStateFromYolo()
 {
-    string folderPath = "C:/Users/USER/Documents/project/final_modal/yolov5/runs/detect";
+    string folderPath = "C:/Users/USER/Documents/פרוייקט/final_modal/yolov5/runs/detect";
     string lastCreatedFolder = getLastCreatedFolder(folderPath)+"/labels";
     onyolo = true;
     while (onyolo)

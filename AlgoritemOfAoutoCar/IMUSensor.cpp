@@ -36,12 +36,11 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
            cerr << "Error opening file." << endl;
        }
        getline(inputFile, line);
-       
        istringstream iss(line);
        iss >> speedX >> speedY; // Extract speed X, speed Y, and time from the line
        speed = sqrt((speedX * speedX) +( speedY * speedY)); // Calculate the total speed
-       
        acceleration = (speed - prevSpeed); // Calculate acceleration
+       cout << "acceleration:" << acceleration << " " << "speed:" << speed<<" ";
        carpoint.SetaccelerationSpeed(acceleration);
        carpoint.SetcurrentSpeed(speed);
        distance += (speed * 1000 / 3600 * GettimeSensor()); // Calculate the total distance covered directly
@@ -58,13 +57,13 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
 void IMUSensor::startIMUSensor(DrivingScenarios& carpoint)
 {
     isRunning = true;
-    imuThread = thread(&IMUSensor::calculateSpeed, carpoint);
+    calculateSpeed(carpoint);
 }
 
 void IMUSensor::stopIMUSensor()
 {
     isRunning = false;
-    imuThread.join();
+   
 }
 
 double IMUSensor::getCurrentSpeed()

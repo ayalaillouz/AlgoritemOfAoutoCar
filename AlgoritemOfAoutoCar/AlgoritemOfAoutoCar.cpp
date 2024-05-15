@@ -3,17 +3,24 @@
 #include "DrivingScenarios.h"
 #include "IMUSensor.h"
 #include "Gpssenssor.h"
+#include "Server.h"
 #include <iostream>
-#include <list>
-#include <vector>
-#include <string.h>
-#include <functional>
-#include <thread> // std::thread, std::this_thread::sleep_for
-#include <chrono>
 #include <string>
-#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <map>
 #include <sstream>
-using namespace std;
+#include <iomanip>
+#include <regex>
+#include <vector>
+#include <list>
+#include <functional>
+#include <thread> 
+#include <chrono>
+#include <fstream>
+#include <cerrno>
+
+
 
 void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 {
@@ -26,7 +33,7 @@ void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 		carpoint.SettimeCar(seconds);
 		imuSensorpoint.SettimeSensor(seconds);
 		// Sleep for 0.5 second
-		
+		cout << "the time now:" << seconds << endl;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
@@ -36,47 +43,45 @@ void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 #define CHECK_DIRECTION(direction) (direction == "right" ?1:0)
 int main()
 {
-
+	Server server;
+	vector<pair<string,string>> carInstructions = server.Receivinginformation();
 	//build object
 
 	IMUSensor imuSensor;
 	DrivingScenarios car;
 	Gpssenssor gpsSenssor;
 	File files;
-	thread timerThread(timerFunction, ref(car), ref(imuSensor));
-	imuSensor.startIMUSensor(ref(car));
-	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo, ref(car));
-	thread Gpsthread(&Gpssenssor::UpdatePossion, ref(car),ref(imuSensor));
-	//start
-	//read Filestring direction;
-	string direction;
-	int placeinarr;
+	thread timerThread(timerFunction,ref(car),ref(imuSensor));
+	thread IMUsensor([&] {imuSensor.startIMUSensor(car); });
+	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo,ref(car));
+	//std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo);
+	thread Gpsthread([&]{gpsSenssor.UpdatePossion(car);});
+	string Instruction,direction;
 	double distance;
-	string filename = "src/Instructions.txt";
-	ifstream file(filename);
-	if (!file.is_open())
+	int placeinarr;
+	// Output the contents of the vector of pairs
+	for (const auto& pair : carInstructions)
 	{
-		cout << "לא ניתן לפתוח את הקובץ." << endl;
-		return 1;
-	}
-	string line;
-	while (getline(file, line))
-	{
+
+		std::cout << pair.first << ": " << pair.second << std::endl;
+		Instruction = pair.first;
+		distance = stod(pair.second);
+		cout << Instruction << distance << endl;
 		car.Setmaxspeed(100);
-		direction = files.GetWordAfterLastDash(line);
-		distance = files.ExtractLastWordToDouble(line);
+		direction = files.GetWordAfterLastDash(Instruction);
 		placeinarr = CHECK_DIRECTION(direction) + CHECK_STRAIGHT(direction);
-		car.PlayHashFunctionDirection(placeinarr,distance);
+		car.PlayHashFunctionDirection(placeinarr, distance);
 		cout << "distance: " << distance << endl;
 		this_thread::sleep_for(chrono::seconds(1));
 	}
-	file.close();
 
-	//join object
-	car.Offyolo();
-	yoloThread.join();
-	imuSensor.stopIMUSensor();
-	Gpsthread.join();
+
 	timerThread.join();
-}
+	yoloThread.join();
+	gpsSenssor.OffGPS();
+	imuSensor.stopIMUSensor();
+	IMUsensor.join();
+	
 
+
+}
