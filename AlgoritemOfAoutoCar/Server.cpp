@@ -53,7 +53,8 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
         cerr << "Unable to listen for incoming connections" << endl;
         exit(EXIT_FAILURE);
     }
-    cout << "Server is listening on port 54000..." << endl;
+    print("Server is listening on port 54000...");
+    //cout << "Server is listening on port 54000..." << endl;
 
     // Accept incoming connection
     client_address_len = sizeof(client_address);
@@ -63,8 +64,9 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
         cerr << "Failed to accept incoming connection" << endl;
 
     }
-
-    cout << "Accepted new connection from client:%d\n", ntohs(client_address.sin_port);
+    print("Accepted new connection from client:%d");
+    print(to_string(ntohs(client_address.sin_port)));
+  //  cout << "Accepted new connection from client:%d\n", ntohs(client_address.sin_port);
 
     // Read HTTP request from client
     char request[1024];
@@ -81,7 +83,9 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
 
     for (const auto& pair : result)
     {
-        std::cout << "[" << pair.first << "," << pair.second << "]" << std::endl;
+        print("["+pair.first+","+ pair.second+ "]");
+  
+        //std::cout << "[" << pair.first << "," << pair.second << "]" << std::endl;
     }
     // cout<<"the length:" <<length<<endl;
     if (length < 0)
@@ -150,7 +154,8 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
 
     // Close client socket
     closesocket(client_socket);
-    cout << "Connection closed" << endl;
+    print("Connection closed");
+   // cout << "Connection closed" << endl;
     // Close server socket
     closesocket(server_socket);
     return result;
@@ -176,5 +181,11 @@ void Server::handle_post(int client_socket, char* request)
 {
     char success_message[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 15\r\n\r\nPost received\n";
     send(client_socket, success_message, strlen(success_message), 0);
+}
+
+void Server::print(const std::string& message)
+{
+    std::lock_guard<std::mutex> lock(mtxprint);
+    std::cout << message << std::endl;
 }
 

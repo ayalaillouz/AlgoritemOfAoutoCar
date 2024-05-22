@@ -20,7 +20,13 @@
 #include <fstream>
 #include <cerrno>
 
+ mutex mtxprint;
 
+void print(const std::string& message) 
+{
+	std::lock_guard<std::mutex> lock(mtxprint);
+	std::cout << message << std::endl;
+}
 
 void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 {
@@ -33,7 +39,9 @@ void timerFunction(DrivingScenarios& carpoint, IMUSensor& imuSensorpoint)
 		carpoint.SettimeCar(seconds);
 		imuSensorpoint.SettimeSensor(seconds);
 		// Sleep for 0.5 second
-		cout << "the time now:" << seconds << endl;
+		string time = "the time now:"+ to_string(seconds);
+		print(time);
+		//cout << "the time now:" << seconds << endl;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
@@ -53,25 +61,28 @@ int main()
 	File files;
 	thread timerThread(timerFunction,ref(car),ref(imuSensor));
 	thread IMUsensor([&] {imuSensor.startIMUSensor(car); });
+	//car.runYolo();
 	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo,ref(car));
 	//std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo);
 	thread Gpsthread([&]{gpsSenssor.UpdatePossion(car);});
-	string Instruction,direction;
+	string Instruction, direction, instruction;
 	double distance;
 	int placeinarr;
 	// Output the contents of the vector of pairs
 	for (const auto& pair : carInstructions)
 	{
-
-		std::cout << pair.first << ": " << pair.second << std::endl;
+		instruction = "instruction now:" +pair.first+ ":" +pair.second;
+		print(instruction);
+		//std::cout << pair.first << ": " << pair.second << std::endl;
 		Instruction = pair.first;
 		distance = stod(pair.second);
-		cout << Instruction << distance << endl;
+		//cout << Instruction << distance << endl;
 		car.Setmaxspeed(100);
 		direction = files.GetWordAfterLastDash(Instruction);
 		placeinarr = CHECK_DIRECTION(direction) + CHECK_STRAIGHT(direction);
 		car.PlayHashFunctionDirection(placeinarr, distance);
-		cout << "distance: " << distance << endl;
+		print(to_string(distance));
+		//cout << "distance: " << distance << endl;
 		this_thread::sleep_for(chrono::seconds(1));
 	}
 

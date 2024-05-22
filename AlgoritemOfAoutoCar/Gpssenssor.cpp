@@ -32,7 +32,7 @@ void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
     }
     catch (const char* error)
     {
-        std::cout << "Error: " << error << std::endl;
+        std::cout << "Error GPS : " << error << std::endl;
     }
 
 }

@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include <bitset>
 #include <stdbool.h>
 #include "File.h"
 
@@ -16,7 +17,7 @@ private:
 	 mutex mtxAccelerationSpeed;
    	 mutex mtxTimeCar;
 	 mutex mtxdistance;
-
+	 mutex mtxprint;
 	 mutex mtxPathOfSpeed;
 	 mutex mtxstate;
 	 mutex mtxTrafficLightColor;
@@ -48,7 +49,7 @@ private:
 	 double oldvelosityY;
 	 double dt;
 	 double distancetoturn;
-	 array<bool,8> arrState;
+	 bitset<6> arrState;
 	 bool play;
 	 int maxspeed;
 
@@ -113,7 +114,10 @@ public:
 	 void UpdateStateFromYolo();
 	 string extractFirstWord(const string& input);
 	 void ConnectKalmanFilter();
+	 void processTxtFiles(const std::string& folderPath);
 	 void processFile(const std::string& filePath);
 	 void Offyolo();
+	 void print(const std::string& message);
+	 //void runYolo();
 };
 
