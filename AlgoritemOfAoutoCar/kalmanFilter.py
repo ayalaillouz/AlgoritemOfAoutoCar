@@ -31,16 +31,15 @@ input1 = float(sys.argv[1])
 input2 = float(sys.argv[2])
 input3 = float(sys.argv[3])
 input4 = float(sys.argv[4])
-input5 = float(sys.argv[5])
 initial_state = np.array([0, 0, 0, 0])  # Initial state: x, y, vx, vy
 process_noise = 0.1
 measurement_noise = 0.1
-dt = input1
+dt = 2
 kf = KalmanFilter(dt, process_noise, measurement_noise)
 kf.x = initial_state
 
 # Measurements of x, y position
-measurements = np.array([[input2,input3],[input4,input5]])
+measurements = np.array([[input1,input2],[input3,input4]])
 
 # Run the Kalman filter
 filtered_positions = []
@@ -49,4 +48,4 @@ for measurement in measurements:
     kf.update(measurement)
     filtered_positions.append(kf.x[:2])
 for p in filtered_positions:
-    print(" ".join(str(os) for os in p))
+   print(" ".join(str(os) for os in p))

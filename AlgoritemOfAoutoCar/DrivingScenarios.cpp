@@ -37,14 +37,15 @@ DrivingScenarios::DrivingScenarios()
     accelerationSpeed = 0.0;
     temp = 0;
     PathOfSpeed = "src/IMUsensor.txt";
+    oldvelosityX = 32.3500 ;
+    oldvelosityY = 35.1000;
     velosityX = 0;
     velosityY = 0;
-    oldvelosityX = 0;
-    oldvelosityY = 0;
-    dt = 1.0;
+    dt = 2;
     onyolo = false;
     play = true;
     maxspeed = 100;
+    i = 2;
 }
 
 string DrivingScenarios::GetTrafficLightColor()
@@ -646,11 +647,12 @@ string DrivingScenarios::extractFirstWord(const string& input)
 
 void DrivingScenarios::ConnectKalmanFilter()
 {
+  
     string result = "";
     try
     {
         // Calling the Kalman filter from a Python file with the parameters we recorded
-        string command = "python.exe kalmanFilter.py " + to_string(dt) + " " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " +
+        string command = "python.exe kalmanFilter.py " + to_string(GetoldvelosityX()) + " " + to_string(GetoldvelosityY()) + " " +
             to_string(GetvelosityX()) + " " + to_string(GetvelosityY());
         pipe = _popen(command.c_str(), "r");
         while (!feof(pipe))
@@ -671,14 +673,21 @@ void DrivingScenarios::ConnectKalmanFilter()
 
         // Access and manipulate the filtered positions as needed
         print("Filtered positions as double array:");
-        cout << "Filtered positions as double array:" << endl;
-        for (double position : filtered_positions)
-        {
-            print(to_string(position));
-            //cout << position << " ";
-        }
-        SetoldvelosityX(filtered_positions[2]);
-        SetoldvelosityY(filtered_positions[3]);
+        //cout << "Filtered positions as double array:" << endl;
+        //for (double position : filtered_positions)
+        //{
+        //    print(to_string(position));
+        //    //cout << position << " ";
+        //}
+        //print("velosityX:"+to_string(filtered_positions[2])+" "+"velosityY:"+to_string(filtered_positions[3]));
+        SetoldvelosityX(GetvelosityX());
+        SetoldvelosityY(GetvelosityY());
+        SetvelosityX(filtered_positions[i]);
+        SetvelosityY(filtered_positions[i+1]);
+        print("velosityX:" + to_string(filtered_positions[i]) + " " + "velosityY:" + to_string(filtered_positions[i+1]));
+        i = i + 2;
+        
+   
         _pclose(pipe);
     }
     catch (const exception& e) 

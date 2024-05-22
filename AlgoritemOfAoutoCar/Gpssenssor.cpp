@@ -13,7 +13,8 @@ Gpssenssor::Gpssenssor()
 }
 void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
 {
-    std::ifstream file("src/GPS.txt");
+    string filepath = "C:\\Users\\USER\\Documents\\פרוייקט\\AlgoritemOfAoutoCar\\src\\GPS.txt";
+    std::ifstream file(filepath);
     double pos1, pos2;
     try
     {
@@ -23,6 +24,8 @@ void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
             std::getline(file, line);
             std::istringstream iss(line);
             iss >>pos1>>pos2;
+            //cout << pos1 << " " << pos2 << endl;
+            print("pos1"+to_string(pos1) + " " +"pos2"+to_string(pos2));
             carpoint.SetvelosityX(pos1);
             carpoint.SetvelosityY(pos2);
             carpoint.ConnectKalmanFilter();
@@ -41,4 +44,10 @@ void Gpssenssor::OffGPS()
 {
     lock_guard<mutex>lock(mtxGps);
     onGps = false;
+}
+
+void Gpssenssor::print(const std::string& message)
+{
+    std::lock_guard<std::mutex> lock(mtxprint);
+    std::cout << message << std::endl;
 }

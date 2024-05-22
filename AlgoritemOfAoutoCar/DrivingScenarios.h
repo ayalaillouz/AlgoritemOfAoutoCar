@@ -52,6 +52,7 @@ private:
 	 bitset<6> arrState;
 	 bool play;
 	 int maxspeed;
+	 int i;
 
 public:
 	 void (DrivingScenarios::*HashFunctionDrivingScenarios[6])() = {&DrivingScenarios::RedLightStraight,&DrivingScenarios::RedLightRight,

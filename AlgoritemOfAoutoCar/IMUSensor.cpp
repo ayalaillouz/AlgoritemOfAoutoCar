@@ -28,19 +28,21 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
 {   
     double prevSpeed = 0.0,acceleration; // Initialize previous speed variable
     string line;
+    string filepath = "C:\\Users\\USER\\Documents\\פרוייקט\\AlgoritemOfAoutoCar\\src\\IMUsensor.txt";
     while (isRunning)
     {
-       ifstream inputFile("src/IMUsensor.txt"); // Open the text file for reading
+       ifstream inputFile(filepath); // Open the text file for reading
        if (!inputFile.is_open())
        {
            cerr << "Error opening file IMU" << endl;
        }
        getline(inputFile, line);
        istringstream iss(line);
-       iss >> speedX >> speedY; // Extract speed X, speed Y, and time from the line
-       speed = sqrt((speedX * speedX) +( speedY * speedY)); // Calculate the total speed
+       iss>>speedX>>speedY; // Extract speed X, speed Y, and time from the line
+       speed = sqrt((speedX * speedX) +(speedY * speedY)); // Calculate the total speed
        acceleration = (speed - prevSpeed); // Calculate acceleration
        print("acceleration:" + to_string(acceleration) + " " + "speed:" + to_string(speed));
+      
        //cout << "acceleration:" << acceleration << " " << "speed:" << speed<<" ";
        carpoint.SetaccelerationSpeed(acceleration);
        carpoint.SetcurrentSpeed(speed);
