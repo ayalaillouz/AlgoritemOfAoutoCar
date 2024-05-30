@@ -61,11 +61,13 @@ int main()
 	File files;
 	thread timerThread(timerFunction,ref(car),ref(imuSensor));
 	thread IMUsensor([&] {imuSensor.startIMUSensor(car); });
+	//this_thread::sleep_for(chrono::seconds(2));
 	//car.runYolo();
-	thread yoloThread(&DrivingScenarios::UpdateStateFromYolo,ref(car));
+	this_thread::sleep_for(chrono::seconds(1));
+    thread yoloThread(&DrivingScenarios::UpdateStateFromYolo,ref(car));
 	//std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo);
 	thread Gpsthread([&]{gpsSenssor.UpdatePossion(car);});
-	string Instruction, direction, instruction;
+	string Instruction,direction, instruction;
 	double distance;
 	int placeinarr;
 	// Output the contents of the vector of pairs
@@ -80,13 +82,13 @@ int main()
 		car.Setmaxspeed(100);
 		direction = files.GetWordAfterLastDash(Instruction);
 		placeinarr = CHECK_DIRECTION(direction) + CHECK_STRAIGHT(direction);
+		//thread play(&DrivingScenarios::PlayHashFunctionDirection, ref(car), placeinarr,distance);
+		//play.join();
 		car.PlayHashFunctionDirection(placeinarr, distance);
-		print(to_string(distance));
+		//print(to_string(distance));
 		//cout << "distance: " << distance << endl;
-		this_thread::sleep_for(chrono::seconds(1));
+		//this_thread::sleep_for(chrono::seconds(1));
 	}
-
-
 	timerThread.join();
 	yoloThread.join();
 	gpsSenssor.OffGPS();

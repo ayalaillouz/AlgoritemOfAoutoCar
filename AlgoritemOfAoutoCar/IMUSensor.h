@@ -19,8 +19,10 @@ private:
 	thread imuThread;
 	mutex mtxtimeSensor;
 	mutex mtxprint;
+	
 	bool isRunning;
+
 	int timeSensor;
-	double speedX, speedY, time, speed, distanceInOneSecond, distance, Dataprocessing, currentSpeed;
+	double speedX, speedY, time, speed, distanceInOneSecond, distance, Dataprocessing, currentSpeed,dt;
 };
 

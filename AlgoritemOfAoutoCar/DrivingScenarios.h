@@ -18,11 +18,12 @@ private:
    	 mutex mtxTimeCar;
 	 mutex mtxdistance;
 	 mutex mtxprint;
-	 mutex mtxPathOfSpeed;
+	 mutex mtxSpeed;
 	 mutex mtxstate;
 	 mutex mtxTrafficLightColor;
 	 mutex mtxvelosityX;
 	 mutex mtxvelosityY;
+	 mutex mtxmaxspeed;
 	 mutex mtxoldvelosityX;
 	 mutex mtxoldvelosityY;
 	 mutex mtxplay;
@@ -119,6 +120,6 @@ public:
 	 void processFile(const std::string& filePath);
 	 void Offyolo();
 	 void print(const std::string& message);
-	 //void runYolo();
+	 void runYolo();
 };
 

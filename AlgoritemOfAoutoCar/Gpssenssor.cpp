@@ -25,7 +25,7 @@ void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
             std::istringstream iss(line);
             iss >>pos1>>pos2;
             //cout << pos1 << " " << pos2 << endl;
-            print("pos1"+to_string(pos1) + " " +"pos2"+to_string(pos2));
+            print("pos1:"+to_string(pos1) + " " +"pos2:"+to_string(pos2));
             carpoint.SetvelosityX(pos1);
             carpoint.SetvelosityY(pos2);
             carpoint.ConnectKalmanFilter();
