@@ -1,3 +1,4 @@
+#pragma once
 #include "Server.h"
 #include <iostream>
 #include <string>
@@ -29,14 +30,14 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
     struct sockaddr_in server_address, client_address;
     socklen_t client_address_len;
 
-    // Create socket
+    // Create socket IPv4 and TCP
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     if (server_socket == -1) {
         cerr << "Unable to create socket" << endl;
         exit(EXIT_FAILURE);
     }
-    // Bind socket to port 5000
+    // Bind socket to port 54000
     memset(&server_address, 0, sizeof(struct sockaddr_in));
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
@@ -53,8 +54,8 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
         cerr << "Unable to listen for incoming connections" << endl;
         exit(EXIT_FAILURE);
     }
+
     print("Server is listening on port 54000...");
-    //cout << "Server is listening on port 54000..." << endl;
 
     // Accept incoming connection
     client_address_len = sizeof(client_address);
@@ -64,9 +65,8 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
         cerr << "Failed to accept incoming connection" << endl;
 
     }
-    print("Accepted new connection from client:%d");
+    print("Accepted new connection from client");
     print(to_string(ntohs(client_address.sin_port)));
-  //  cout << "Accepted new connection from client:%d\n", ntohs(client_address.sin_port);
 
     // Read HTTP request from client
     char request[1024];
@@ -76,7 +76,8 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
     std::vector<std::pair<std::string, std::string>> result;
 
     std::string message = request;
-    while (std::regex_search(message, match, regex)) {
+    while (std::regex_search(message, match, regex)) 
+    {
         result.push_back(std::make_pair(match[1].str(), match[2].str()));
         message = match.suffix();
     }
@@ -84,16 +85,12 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
     for (const auto& pair : result)
     {
         print("["+pair.first+","+ pair.second+ "]");
-  
-        //std::cout << "[" << pair.first << "," << pair.second << "]" << std::endl;
     }
-    // cout<<"the length:" <<length<<endl;
     if (length < 0)
     {
         cout << "Failed to read from client" << endl;
         closesocket(client_socket);
     }
-    // cout<< message<<endl;
      // Extract the path from the message
     std::string path = message.substr(message.find_first_of('/') + 1, message.find('?') - message.find_first_of('/') - 1);
 
@@ -105,7 +102,8 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
     // Parse the query string to extract objects
     std::stringstream ss(queryString);
     std::string token;
-    while (std::getline(ss, token, '&')) {
+    while (std::getline(ss, token, '&'))
+    {
         std::string::size_type pos = token.find('=');
         int key = std::stoi(token.substr(0, pos));
         std::string value = token.substr(pos + 1);
@@ -115,9 +113,6 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
     // Extract the title of the message
     std::string title = path;
 
-    // Output the title and objects
-  //  std::cout << "Title of the message: " << title << std::endl;
- //   std::cout << "Objects:" << std::endl;
     // Determine the HTTP request method
     char http_method[10];
     int i = 0;
@@ -131,7 +126,8 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
     char uri[1024];
     int j = 0;
     i++;
-    while (request[i] != ' ') {
+    while (request[i] != ' ')
+    {
         uri[j] = request[i];
         i++;
         j++;
@@ -155,7 +151,6 @@ std::vector<std::pair<std::string, std::string>> Server::Receivinginformation()
     // Close client socket
     closesocket(client_socket);
     print("Connection closed");
-   // cout << "Connection closed" << endl;
     // Close server socket
     closesocket(server_socket);
     return result;

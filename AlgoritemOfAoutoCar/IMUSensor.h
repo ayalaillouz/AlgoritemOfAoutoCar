@@ -6,6 +6,12 @@ using namespace std;
 
 class IMUSensor
 {
+	thread imuThread;
+	mutex mtxtimeSensor;
+	mutex mtxprint;
+	bool isRunning;
+	int timeSensor;
+	double speedX,speedY,time,speed,distanceInOneSecond,distance,Dataprocessing,currentSpeed,dt;
 public:
 	IMUSensor();
 	void calculateSpeed(DrivingScenarios& carpoint);
@@ -14,15 +20,8 @@ public:
 	double getCurrentSpeed();
 	int GettimeSensor();
 	void SettimeSensor(int second);
-	void print(const std::string& message);
-private:
-	thread imuThread;
-	mutex mtxtimeSensor;
-	mutex mtxprint;
-	
-	bool isRunning;
+	void print(const string& message);
 
-	int timeSensor;
-	double speedX, speedY, time, speed, distanceInOneSecond, distance, Dataprocessing, currentSpeed,dt;
+
 };
 

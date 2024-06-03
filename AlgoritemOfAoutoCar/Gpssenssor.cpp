@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <string>
+using namespace std;
 
 Gpssenssor::Gpssenssor()
 {
@@ -14,7 +16,7 @@ Gpssenssor::Gpssenssor()
 void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
 {
     string filepath = "C:\\Users\\USER\\Documents\\פרוייקט\\AlgoritemOfAoutoCar\\src\\GPS.txt";
-    std::ifstream file(filepath);
+    ifstream file(filepath);
     double pos1, pos2;
     try
     {
@@ -24,7 +26,6 @@ void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
             std::getline(file, line);
             std::istringstream iss(line);
             iss >>pos1>>pos2;
-            //cout << pos1 << " " << pos2 << endl;
             print("pos1:"+to_string(pos1) + " " +"pos2:"+to_string(pos2));
             carpoint.SetvelosityX(pos1);
             carpoint.SetvelosityY(pos2);
@@ -35,7 +36,7 @@ void Gpssenssor::UpdatePossion(DrivingScenarios& carpoint)
     }
     catch (const char* error)
     {
-        std::cout << "Error GPS : " << error << std::endl;
+        cout << "Error GPS : " << error << endl;
     }
 
 }
@@ -46,8 +47,8 @@ void Gpssenssor::OffGPS()
     onGps = false;
 }
 
-void Gpssenssor::print(const std::string& message)
+void Gpssenssor::print(const string& message)
 {
-    std::lock_guard<std::mutex> lock(mtxprint);
-    std::cout << message << std::endl;
+    lock_guard<mutex> lock(mtxprint);
+    cout << message << endl;
 }

@@ -7,13 +7,11 @@
 #include <bitset>
 #include <stdbool.h>
 #include "File.h"
-
 using namespace std;
+
 class DrivingScenarios
 {
-private:
    	 mutex mtxCurrentSpeed;
-	 string line;
 	 mutex mtxAccelerationSpeed;
    	 mutex mtxTimeCar;
 	 mutex mtxdistance;
@@ -27,44 +25,43 @@ private:
 	 mutex mtxoldvelosityX;
 	 mutex mtxoldvelosityY;
 	 mutex mtxplay;
-	 double accelerationSpeed;
-	 double currentSpeed;
-	 bool degel;
 	 string str;
+	 string line;
 	 string directiontotravel;
 	 string signal;
 	 string PathOfSpeed;
 	 string direction;
-	 int temp;
-	 double distance;
-	 int timeCar;
-	 bool onyolo;
-	 string state;
 	 string TrafficLightColor;
-	 char buffer[128];
+	 string state;
 	 FILE* pipe;
 	 vector<double> filtered_positions;
+	 bitset<6> arrState;
+	 int temp;
+	 int timeCar;
+	 int maxspeed;
+	 int i;
+	 char buffer[128];
+	 bool degel;
+	 bool onyolo;
 	 double velosityX ;
 	 double velosityY;
 	 double oldvelosityX ;
 	 double oldvelosityY;
 	 double dt;
 	 double distancetoturn;
-	 bitset<6> arrState;
-	 bool play;
-	 int maxspeed;
-	 int i;
-
+	 double accelerationSpeed;
+	 double currentSpeed;
+	 double distance;
 public:
 	 void (DrivingScenarios::*HashFunctionDrivingScenarios[6])() = {&DrivingScenarios::RedLightStraight,&DrivingScenarios::RedLightRight,
 																    &DrivingScenarios::RedLightLeft,&DrivingScenarios::GreenLight,
 																	&DrivingScenarios::Stop,&DrivingScenarios::SpeedLimitSignFor80};
 	 void (DrivingScenarios::*HashFunctionDirection[3])(double) = { &DrivingScenarios::Left,&DrivingScenarios::Right,
-																	&DrivingScenarios::Straight };
-
+																	&DrivingScenarios::Straight};
+	 
+	 DrivingScenarios();
 	 void PlayHashFunctionDirection( int placeinhash, double dist);
 	 void PlayHashFunctionDrivingScenarios(int placeinhash);
-	 DrivingScenarios();
 	 double GetvelosityX();
 	 void SetvelosityX(double newvelosityX);
 	 double GetvelosityY();
@@ -73,15 +70,12 @@ public:
 	 void SetoldvelosityX(double newoldvelosityX);
 	 double GetoldvelosityY();
 	 void SetoldvelosityY(double newoldvelosityY);
-	 bool Getplay();
-     void Setplay(bool newplay);
 	 string Getdirection();
 	 void Setdirection(string newdirection);
 	 string GetTrafficLightColor();
 	 void SetTrafficLightColor(string newTrafficLightColor);
 	 double Getdistance();
 	 void Setdistance(double newdistance);
-	 //string Getstate();
 	 double Getdistancetoturn();
 	 void SetaccelerationSpeed(double newaccelationspeed);
 	 double GetaccelerationSpeed();
@@ -92,7 +86,6 @@ public:
 	 string GetPathOfSpeed();
 	 int MaxSpeed();
 	 void Setmaxspeed(int newmaxspeed);
-	// void Setstate(string s);
 	 void RedLightStraight();
 	 void RedLightRight();
 	 void RedLightLeft();
@@ -102,16 +95,11 @@ public:
 	 void SignalLight(std::string direction);
 	 void SlowdownCar(int minSpeed=0);
 	 void SpeedCar(int maxSpeed=120);
-	// double DistanceFromCarToObject(std::string filename);
 	 string ReadFromFile(std::string filepath);
 	 void Right(double distancetoturnRight);
 	 void Left(double distancetoturnLeft);
 	 void Setdistancetoturn(double newdistancetoturn);
 	 void Straight(double distancetoturnStraight=0);
-	// void LaneChangeRight();
-	// void LaneChangeLeft();
-	// void  WaitingForGreenLight();
-	// void calculateAcceleration(IMUSensor& imuSensorpoint);
 	 string getLastCreatedFolder(const string& path);
 	 void UpdateStateFromYolo();
 	 string extractFirstWord(const string& input);

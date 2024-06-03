@@ -19,7 +19,7 @@
 #include <chrono>
 #include <fstream>
 #include <cerrno>
-
+using namespace std;
  mutex mtxprint;
 
 void print(const std::string& message) 
@@ -53,42 +53,42 @@ int main()
 {
 	Server server;
 	vector<pair<string,string>> carInstructions = server.Receivinginformation();
-	//build object
 
+	//build object
 	IMUSensor imuSensor;
 	DrivingScenarios car;
 	Gpssenssor gpsSenssor;
 	File files;
+
+	//play sensors
 	thread timerThread(timerFunction,ref(car),ref(imuSensor));
 	thread IMUsensor([&] {imuSensor.startIMUSensor(car); });
-	//this_thread::sleep_for(chrono::seconds(2));
 	//car.runYolo();
 	this_thread::sleep_for(chrono::seconds(1));
     thread yoloThread(&DrivingScenarios::UpdateStateFromYolo,ref(car));
-	//std::thread yoloThread(&DrivingScenarios::UpdateStateFromYolo);
 	thread Gpsthread([&]{gpsSenssor.UpdatePossion(car);});
+
+
 	string Instruction,direction, instruction;
 	double distance;
 	int placeinarr;
-	// Output the contents of the vector of pairs
+
+	//navigation instructions
+
 	for (const auto& pair : carInstructions)
 	{
 		instruction = "instruction now:" +pair.first+ ":" +pair.second;
 		print(instruction);
-		//std::cout << pair.first << ": " << pair.second << std::endl;
 		Instruction = pair.first;
 		distance = stod(pair.second);
-		//cout << Instruction << distance << endl;
 		car.Setmaxspeed(100);
 		direction = files.GetWordAfterLastDash(Instruction);
 		placeinarr = CHECK_DIRECTION(direction) + CHECK_STRAIGHT(direction);
-		//thread play(&DrivingScenarios::PlayHashFunctionDirection, ref(car), placeinarr,distance);
-		//play.join();
 		car.PlayHashFunctionDirection(placeinarr, distance);
-		//print(to_string(distance));
-		//cout << "distance: " << distance << endl;
-		//this_thread::sleep_for(chrono::seconds(1));
 	}
+
+	//Switching off and disconnecting sensors
+
 	timerThread.join();
 	yoloThread.join();
 	gpsSenssor.OffGPS();

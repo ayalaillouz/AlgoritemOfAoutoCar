@@ -13,6 +13,8 @@
 #include "IMUSensor.h"
 #include "DrivingScenarios.h"
 using namespace std;
+
+
 IMUSensor::IMUSensor()
 {
  timeSensor = 0;
@@ -20,7 +22,6 @@ IMUSensor::IMUSensor()
  currentSpeed = 0.0;
  isRunning = false;
  dt = 1.0;
-
 }
 
 
@@ -28,7 +29,7 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
 {
     double prevSpeed = 0.0, acceleration; // Initialize previous speed variable
     string line;
-    string filepath = "C:\\Users\\USER\\Documents\\פרוייקט\\AlgoritemOfAoutoCar\\src\\IMUsensor.txt";
+    string filepath = "C:/Users/USER/Documents/פרוייקט/AlgoritemOfAoutoCar/src/IMUsensor.txt";
 
     while (isRunning)
     {
@@ -45,14 +46,13 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
             iss >> speedX >> speedY; // Extract speed X, speed Y, and time from the line
             speed = sqrt((speedX * speedX) + (speedY * speedY)); // Calculate the total speed
             acceleration = (speed - prevSpeed) / dt; // Calculate acceleration
-            print("acceleration:" + to_string(acceleration) + " " + "speed:" + to_string(speed));
-
+            print("acceleration: " + to_string(acceleration));
+            print("speed: " + to_string(speed));
             carpoint.SetaccelerationSpeed(acceleration);
             carpoint.SetcurrentSpeed(speed);
-            distance = (speed * 1000 / 3600 * GettimeSensor()); // Calculate the total distance covered directly
+            distance = (speed * 1000 / 3600 * GettimeSensor()); // 1000=1 k"m, 3600 secoend=1 hour
             carpoint.Setdistance(distance);
             print("Distance covered in current iteration: " + to_string(carpoint.Getdistance()) + " meters");
-
             prevSpeed = speed; // Update previous speed to current speed
             inputFile.close(); // Close the file
 
@@ -61,7 +61,8 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
             ifstream inputFile2("C:/Users/USER/Documents/פרוייקט/AlgoritemOfAoutoCar/src/IMUsensor.txt"); // Reopen the original file for reading
 
             // Skip the first line
-            if (inputFile2.good() && tempFile.good()) {
+            if (inputFile2.good() && tempFile.good()) 
+            {
                 getline(inputFile2, line); // Skip the first line
 
 
@@ -75,7 +76,7 @@ void IMUSensor::calculateSpeed(DrivingScenarios& carpoint)
                 inputFile2.close();
 
                 // Delete the original file
-                remove("C:\\Users\\USER\\Documents\\פרוייקט\\AlgoritemOfAoutoCar\\src\\IMUsensor.txt");
+                remove("C:/Users/USER/Documents/פרוייקט/AlgoritemOfAoutoCar/src/IMUsensor.txt");
 
                 // Rename the temporary file to the original filename
                 rename("C:/Users/USER/Documents/פרוייקט/AlgoritemOfAoutoCar/src/IMUsensorTemp.txt", "C:/Users/USER/Documents/פרוייקט/AlgoritemOfAoutoCar/src/IMUsensor.txt");
@@ -101,14 +102,6 @@ double IMUSensor::getCurrentSpeed()
 {
     return currentSpeed;
 }
-
-//double IMUSensor::getdt()
-//{
-//    return dt;
-//}
-
-
-
 
 int IMUSensor::GettimeSensor()
 {

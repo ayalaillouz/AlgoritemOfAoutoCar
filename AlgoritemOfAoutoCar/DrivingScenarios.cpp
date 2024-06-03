@@ -6,7 +6,6 @@
 #include <sstream>
 #include <chrono>
 #include <thread>
-#include <fstream>
 #include <string>
 #include <mutex>
 #include <vector>
@@ -23,14 +22,14 @@
 #include <codecvt>
 
 
-
-
 #define check_RedLightStraight(state)((state ==0||state==3)?0:1);
 #define check_RedLightRight(state)(state ==5?0:1);
 #define check_RedLightLeft(state)(state ==4?0:1);
 #define check_GreenLight(state)((state ==1||state==6||state==7||state==8)?0:1);
 #define check_Stop(state)((state ==9||state==11)?0:1);
 #define check_SpeedLimitSignFor80(state)(state ==10?0:1);
+
+
 using namespace std;
 namespace fs = filesystem;
 
@@ -41,14 +40,13 @@ DrivingScenarios::DrivingScenarios()
     currentSpeed = 0.0;
     accelerationSpeed = 0.0;
     temp = 0;
-    PathOfSpeed = "C:\\Users\\USER\\Documents\\פרוייקט\\AlgoritemOfAoutoCar\\src\\IMUsensor.txt";
+    PathOfSpeed = "C:/Users/USER/Documents/פרוייקט/AlgoritemOfAoutoCar/src/IMUsensor.txt";
     oldvelosityX = 32.3500 ;
     oldvelosityY = 35.1000;
     velosityX = 0;
     velosityY = 0;
     dt = 2;
     onyolo = false;
-    play = true;
     maxspeed = 100;
     i = 2;
     distance = 0.0;
@@ -66,20 +64,6 @@ void DrivingScenarios::SetTrafficLightColor(string newTrafficLightColor)
     lock_guard<mutex>lock(mtxTrafficLightColor);
     TrafficLightColor =newTrafficLightColor;
 }
-
-void DrivingScenarios::Setplay(bool newplay)
-{
-
-    lock_guard<mutex>lock(mtxplay);
-    play = newplay;
-}
-
-bool DrivingScenarios::Getplay()
-{
-    lock_guard<mutex>lock(mtxplay);
-    return play;
-}
-
 
 string DrivingScenarios::Getdirection()
 {
@@ -102,7 +86,6 @@ void DrivingScenarios::SetoldvelosityX(double newoldvelosityX)
     lock_guard<mutex>lock(mtxvelosityX);
     oldvelosityX = newoldvelosityX;
 }
-
 
 double DrivingScenarios::GetoldvelosityY()
 {
@@ -151,16 +134,16 @@ void DrivingScenarios::Setdistance(double newdistance)
 {
     lock_guard<mutex>lock(mtxdistance);
     distance += newdistance;
-    if (Getdistancetoturn()-newdistance>=0 )
+    if (Getdistancetoturn()-newdistance>=0)
     {
         Setdistancetoturn(Getdistancetoturn()-newdistance);
     }
     else
     {
         Setdistancetoturn(0.0);
+        distance = 0.0;
         print("Setdistancetoturn 0.0");
     }
-    
 }
 
 double DrivingScenarios::GetcurrentSpeed()
@@ -209,7 +192,6 @@ void DrivingScenarios::SettimeCar(int second)
     timeCar = second;
 }
 
-
 string DrivingScenarios::GetPathOfSpeed()
 {
     std::lock_guard<std::mutex> lock(mtxSpeed);
@@ -221,11 +203,11 @@ void DrivingScenarios::PlayHashFunctionDirection(int placeinhash, double dist)
 
     (this->*HashFunctionDirection[placeinhash])(dist);
 }
+
 void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
 {
     (this->*HashFunctionDrivingScenarios[placeinhash])();
 }
-
 
 //double DrivingScenarios::DistanceFromCarToObject(std::string filename)
 //{
@@ -278,63 +260,51 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
 //    return minVal;
 //}
 
-
  void DrivingScenarios::RedLightStraight()
  {
-     if (directiontotravel == "Straight")
+     if (directiontotravel.compare("Straight")==0)
      {
          print("RedLightStraight function now play");
-         // cout << "RedLightStraight function now play" << endl;
-       //  Setplay(false);
          SetTrafficLightColor("Red");
-         while (GetTrafficLightColor() == "Red")
+         while (GetTrafficLightColor().compare("Red") == 0)
          {
              SlowdownCar();
              std::this_thread::sleep_for(std::chrono::seconds(1));
          }
-        // Setplay(true);
          arrState.reset(0);
-         Straight(Getdistancetoturn());
      }
  }
 
  void DrivingScenarios::RedLightRight()
  {
      
-     if (directiontotravel == "Right")
+     if (directiontotravel.compare("Right")==0)
      {
          print("RedLightRight function now play");
-         //Setplay(false);
          SetTrafficLightColor("Red");
-         while (GetTrafficLightColor()=="Red")
+         while (GetTrafficLightColor().compare("Red")==0)
          {
              SlowdownCar();
              SignalLight("Right");
              this_thread::sleep_for(chrono::seconds(1));
          }
-       //  Setplay(true);
          arrState.reset(1);
-         Right(distancetoturn);
      }
  }
 
-
  void DrivingScenarios::RedLightLeft()
  {
-     if (directiontotravel == "Left")
+     if (directiontotravel.compare("Left")==0)
      {
          print("RedLightLeft function now play");
-       //  Setplay(false);
          SetTrafficLightColor("Red");
-         while (GetTrafficLightColor() == "Red")
+         while (GetTrafficLightColor().compare("Red")==0)
          {
              SlowdownCar();
              SignalLight("Left");
              this_thread::sleep_for(chrono::seconds(1));
          }
-        // Setplay(true);
          arrState.reset(2);
-         Left(Getdistancetoturn());
      }  
  }
 
@@ -365,7 +335,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
              deltaY = GetaccelerationSpeed() * (speedY / speed);
              speedX = speedX + deltaX;
              speedY = speedY + deltaY;
-             outputFile << speedX << " " << speedY << endl; // Write the modified number to the temporary file
+             outputFile << speedX << " " << speedY << endl;
          }
 
          outputFile << inputFile.rdbuf();
@@ -383,6 +353,7 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
          }
      }
  }
+
  void DrivingScenarios::SlowdownCar(int MinSpeed)
  {
      print("SlowdownCar function now play");
@@ -390,8 +361,8 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
      if (GetcurrentSpeed() > MinSpeed)
      {
          string line;
-         ifstream inputFile(GetPathOfSpeed()); // Open input file for reading
-         ofstream outputFile("temp.txt", ios::trunc); // Create temporary output file
+         ifstream inputFile(GetPathOfSpeed()); 
+         ofstream outputFile("temp.txt", ios::trunc); 
          double speedX, speedY, deltaX, deltaY, speed;
          if (!inputFile.is_open())
          {
@@ -431,13 +402,14 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
  {
      SetTrafficLightColor("Green");
      print("GreenLight function now play");
-     while (GetcurrentSpeed() < MaxSpeed())
+     while (GetcurrentSpeed() <MaxSpeed())
      {
          SpeedCar(MaxSpeed());
          this_thread::sleep_for(chrono::seconds(1));
      }
      arrState.reset(3);
  }
+
  void DrivingScenarios::Stop()
  {
      while (GetcurrentSpeed()>0.0)
@@ -463,7 +435,6 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
  void DrivingScenarios::SpeedLimitSignFor80()
  {
      print("SpeedLimitSignFor80 function now play");
-    // cout << "SpeedLimitSignFor80 function now play" << endl;
      Setmaxspeed(80);
      while (GetcurrentSpeed()>80)
      {
@@ -477,7 +448,6 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
  {
      signal = direction;
      print("signal: "+signal);
-     //cout << "signal:" << signal << endl;
  }
 
 
@@ -487,7 +457,6 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
      directiontotravel = "Right";
      print("Right function now play");
      Setdistancetoturn(distancetoturnRight);
-     //while (Getdistancetoturn()>0.0 && Getplay())
      while (Getdistancetoturn() > 0.0)
      {
          std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -503,7 +472,6 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
      directiontotravel = "Left";
      print("Left function now play");
      Setdistancetoturn(distancetoturnLeft);
-     //while (Getdistancetoturn()>0.0&&Getplay())
      while (Getdistancetoturn() > 0.0)
      {
          std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -522,21 +490,12 @@ void DrivingScenarios::PlayHashFunctionDrivingScenarios(int placeinhash)
      print("Straight function now play");
      Setdirection("Straight");
      Setdistancetoturn(distancetoturnStraight);
-     //while (Getdistancetoturn()>0.0 && Getplay())
      while (Getdistancetoturn() > 0.0)
      {
          std::this_thread::sleep_for(std::chrono::seconds(1));
      }
  }
 
- //void  DrivingScenarios::WaitingForGreenLight()
- //{
- //    while (GetTrafficLightColor() =="Red")
- //    {
- //       std::this_thread::sleep_for(std::chrono::seconds(1));
- //    }
- //
- //}
 
  string DrivingScenarios::ReadFromFile(string filepath)
  {
@@ -588,8 +547,76 @@ void DrivingScenarios::UpdateStateFromYolo()
 {
     string path = "C:\\Users\\USER\\Documents\\פרוייקט\\final_modal\\yolov5\\runs\\detect";
     string lastCreatedFolder =getLastCreatedFolder(path)+"\\labels";
-    
     processTxtFiles(lastCreatedFolder);
+}
+
+void DrivingScenarios::processTxtFiles(const std::string& folderPath)
+{
+    onyolo = true;
+    while (onyolo)
+    {
+        for (const auto& entry : fs::directory_iterator(folderPath))
+        {
+            if (entry.path().extension() == ".txt")
+            {
+                processFile(entry.path().string());
+            }
+        }
+    }
+}
+
+void DrivingScenarios::processFile(const string& filePath)
+{
+    ifstream inputFile(filePath);
+    int state, placeinHashFunctionDrivingScenarios;
+    if (!inputFile)
+    {
+        std::cerr << "Error opening the file of yolo: " << filePath << "\n";
+        return;
+    }
+
+    std::string line, word;
+    while (std::getline(inputFile, line))
+    {
+        std::istringstream iss(line);
+        iss >> word;
+        int state = std::stoi(word);
+        placeinHashFunctionDrivingScenarios = check_RedLightStraight(state) + check_RedLightRight(state)
+            + check_RedLightLeft(state) + check_GreenLight(state) + check_Stop(state) + check_SpeedLimitSignFor80(state);
+
+        if (placeinHashFunctionDrivingScenarios >= 0 && placeinHashFunctionDrivingScenarios < 6)
+        {
+            if (!arrState.test(placeinHashFunctionDrivingScenarios))
+            {
+                arrState.set(placeinHashFunctionDrivingScenarios);
+                thread t(&DrivingScenarios::PlayHashFunctionDrivingScenarios, this, placeinHashFunctionDrivingScenarios);
+                t.detach();
+            }
+        }
+
+    }
+
+    inputFile.close(); 
+    std::remove(filePath.c_str());
+    print("File " + filePath + " processed and deleted");
+}
+
+void DrivingScenarios::runYolo()
+{
+    std::wstring batchFilePath = L"C:\\Users\\USER\\Documents\\פרוייקט\\final_modal\\yolov5\\CMD.bat";
+
+    // Build the command to run the batch file
+    std::wstring fullCommand = L"\"";
+    fullCommand += batchFilePath;
+    fullCommand += L"\"";
+
+    // Execute the command to run the batch file
+    _wsystem(fullCommand.c_str());
+}
+
+void DrivingScenarios::Offyolo()
+{
+    onyolo = false;
 }
 
 string DrivingScenarios::extractFirstWord(const string& input)
@@ -623,7 +650,6 @@ void DrivingScenarios::ConnectKalmanFilter()
 
         }
 
-
         stringstream ss(result);
         double pos;
         while (ss >> pos)
@@ -644,79 +670,6 @@ void DrivingScenarios::ConnectKalmanFilter()
     }
 }
 
-void DrivingScenarios::processTxtFiles(const std::string& folderPath)
-{
-    onyolo = true;
-    while (onyolo)
-    {
-        for (const auto& entry : fs::directory_iterator(folderPath))
-        {
-            if (entry.path().extension() == ".txt")
-            {
-                processFile(entry.path().string());
-            }
-        }
-    }
-}
-
-
-void DrivingScenarios::processFile(const string& filePath)
-{
-    ifstream inputFile(filePath);
-    int state, placeinHashFunctionDrivingScenarios;
-    if (!inputFile)
-    {
-        std::cerr << "Error opening the file of yolo: " << filePath << "\n";
-        return;
-    }
-
-    std::string line, word;
-    while (std::getline(inputFile, line))
-    {
-        std::istringstream iss(line);
-        iss >> word;
-        int state = std::stoi(word);
-        placeinHashFunctionDrivingScenarios = check_RedLightStraight(state) + check_RedLightRight(state)
-            + check_RedLightLeft(state) + check_GreenLight(state) + check_Stop(state) + check_SpeedLimitSignFor80(state);
-
-        if (placeinHashFunctionDrivingScenarios >= 0 && placeinHashFunctionDrivingScenarios < 6)
-        {
-            if (!arrState.test(placeinHashFunctionDrivingScenarios))
-            {
-                arrState.set(placeinHashFunctionDrivingScenarios);
-                thread t(&DrivingScenarios::PlayHashFunctionDrivingScenarios, this, placeinHashFunctionDrivingScenarios);
-                t.detach();
-            }
-        }
-
-    }
-
-    inputFile.close(); // Close the file after processing
-
-    // Close the file and then delete it
-    std::remove(filePath.c_str());
-    print("File " + filePath + " processed and deleted");
-    //std::cout << "File " << filePath << " processed and deleted.\n";
-}
-void DrivingScenarios::runYolo()
-{
-    std::wstring batchFilePath = L"C:\\Users\\USER\\Documents\\פרוייקט\\final_modal\\yolov5\\CMD.bat";
-
-    // Build the command to run the batch file
-    std::wstring fullCommand = L"\"";
-    fullCommand += batchFilePath;
-    fullCommand += L"\"";
-
-    // Execute the command to run the batch file
-    _wsystem(fullCommand.c_str());
-}
-
-
-
-void DrivingScenarios::Offyolo()
-{
-    onyolo = false;
-}
 
 void DrivingScenarios::print(const std::string& message)
 {
